@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html ng-app='mmdApp'>
+  <head>
+    <meta charset="UTF-8">
+    <base href="./">
+    <title>MMD</title>
+    <link rel="stylesheet" href="styles.css" />
+    <!-- SDK Library -->
+    <script src="assets/libs/angular.js"></script>
+    <script src="assets/libs/angular-route.js"></script>
+    <script src="assets/libs/angular-sanitize.js"></script>
+    <script src="assets/libs/angular-translate.js"></script>
+    <script src="assets/libs/angular-translate-loader-static-files.js"></script>
+    <!-- App part -->
+    <script src="app.module.js"></script>
+    <script src="app.route.js"></script>
+    <script src="app.i18n.js"></script>
+    <!-- Service part -->
+    <!-- Shared part -->
+    <!-- Components part -->
+    <script src="components/home/home.component.js"></script>
+  </head>
+  <body>
+    <div ng-view></div>
+  </body>
+</html>

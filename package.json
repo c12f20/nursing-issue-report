@@ -1,0 +1,16 @@
+{
+  "name": "nursing-issue-report",
+  "version": "1.0.0",
+  "description": "A Tool to generate report of nursing issues",
+  "main": "main.js",
+  "scripts": {
+    "rebuild": "electron-rebuild -f -s -v 1.8.4",
+    "start": "electron ."
+  },
+  "author": "hill.cen",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^1.8.4"
+  },
+  "dependencies": {}
+}
