@@ -1,1 +1,10 @@
 @import "assets/css/bootstrap.css";
+
+body {
+  margin: auto;
+  padding: 0;
+  width: 1024px;
+  height: 768px;
+}
+
+@import "components/root.component.css";

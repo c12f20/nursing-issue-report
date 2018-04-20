@@ -1,6 +1,6 @@
 'use strict';
 
-mmdApp.config(['$translateProvider',
+nirApp.config(['$translateProvider',
   function($translateProvider) {
     let english = {
       CAPTION_YES: "Yes",

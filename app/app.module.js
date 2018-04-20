@@ -1,11 +1,11 @@
 'use strict';
 
-angular.module('mmdServices', ['pascalprecht.translate']);
+const nirServices = angular.module('nirServices', ['pascalprecht.translate']);
 
-angular.module('mmdControllers', ['mmdServices']);
+const nirControllers = angular.module('nirControllers', ['nirServices']);
 
-angular.module('mmdApp', [
-  'ngRoute',
+const nirApp = angular.module('nirApp', [
   'ngSanitize',
-  'mmdControllers',
+  'ui.router',
+  'nirControllers',
 ]);

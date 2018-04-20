@@ -1,17 +1,23 @@
 'use strict';
 
-const mmdApp = angular.module('mmdApp');
+nirApp.config(['$stateProvider', '$urlRouterProvider',
+  function($stateProvider, $urlRouterProvider) {
+    $urlRouterProvider.otherwise('root');
 
-mmdApp.config(['$routeProvider',
-  function($routeProvider){
-    $routeProvider
-      .when('/main', {
+    $stateProvider
+      .state('root', {
+        url: '/',
+        templateUrl: 'components/root.component.html',
+        controller: 'RootController'
+      })
+      .state('root.home', {
+        url: 'home',
         templateUrl: 'components/home/home.component.html',
         controller: 'HomeController'
       })
-      .otherwise({
-        redirectTo: function(route, path, search) {
-          return '/main';
-        }
+      .state('root.issues', {
+        url: 'issues',
+        templateUrl: 'components/issues/issues.component.html',
+        controller: 'IssuesController'
       });
   }]);
