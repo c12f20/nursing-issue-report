@@ -9,7 +9,7 @@ nirServices.factory('DbService', function() {
   const DB_VERSION_CURRENT = 1;
   // Construct database
   var db = null;
-  function createDatabase() {
+  function __createDatabase() {
     db = new sqlite3.Database(DB_PATH, sqlite3.OPEN_CREATE | sqlite3.OPEN_READWRITE, (err) => {
       if (err) {
         console.error(err.message);
@@ -49,22 +49,22 @@ nirServices.factory('DbService', function() {
     });
   }
 
-  function alertDatabase(db_version) {
+  function __alertDatabase(db_version) {
     if (db_version === DB_VERSION_CURRENT) {
       return;
     }
     // todo: now always create a new database, I'll add database alert process for different versions later
-    closeDatabase().then(() => {
+    __closeDatabase().then(() => {
       if (fs.existsSync(DB_PATH)) {
         fs.unlinkSync(DB_PATH);
       }
-      createDatabase();
+      __createDatabase();
     }, (err) => {
       console.error(err.message);
     });
   }
 
-  function getDatabaseVersion() {
+  function __getDatabaseVersion() {
     return new Promise((resolve, reject) => {
       let version = DB_VERSION_INVALID;
       db = new sqlite3.Database(DB_PATH, sqlite3.OPEN_READWRITE, (err) => {
@@ -87,7 +87,7 @@ nirServices.factory('DbService', function() {
     });
   }
 
-  function closeDatabase() {
+  function __closeDatabase() {
     return new Promise((resolve, reject) => {
       if (!db) {
         resolve();
@@ -106,24 +106,100 @@ nirServices.factory('DbService', function() {
   }
 
   function init() {
-    getDatabaseVersion().then((db_version) => {
+    __getDatabaseVersion().then((db_version) => {
       console.log(`Current Database version ${db_version}`);
-      alertDatabase(db_version);
+      __alertDatabase(db_version);
     }, (err) => {
       console.warn(err.message);
-      alertDatabase(DB_VERSION_INVALID);
+      __alertDatabase(DB_VERSION_INVALID);
     });
   }
 
   // Destroy Database
   function destroy() {
-    closeDatabase();
+    __closeDatabase();
+  }
+
+  // Report related methods
+  function addReport(department_id, issue_object) {
+    return new Promise((resolve, reject) => {
+      if (!department_id || !issue_object
+      || !(issue_object instanceof Issue)) {
+        reject(new Error("Failed to add report with invalid parameters"));
+        return;
+      }
+      if (!db) {
+        reject(new Error("Failed to add report as database isn't ready"));
+        return;
+      }
+      db.run(`INSERT INTO tblReport (department_id, issue_id, creation_time, data)
+        VALUES (${department_id}, ${issue_object.issue_id}, ${issue_object.creation_time}, ${issue_object.option_values})`,
+        (err) => {
+          if (err) {
+            reject(new Error(`Failed to add report, error: ${err.message}`));
+            return;
+          }
+          resolve();
+        });
+    });
+  }
+
+  function removeReport(report_id) {
+    return new Promise((resolve, reject) => {
+      if (!report_id) {
+        reject(new Error("Failed to remove report with invalid report id"));
+        return;
+      }
+      if (!db) {
+        reject(new Error("Failed to remove report as database isn't ready"));
+        return;
+      }
+
+      db.run(`DELETE FROM tblReport where id = ${report_id}`,
+        (err) => {
+          if (err) {
+            reject(new Error(`Failed to remove report ${report_id}, error: ${err.message}`));
+            return;
+          }
+          resolve();
+        });
+    });
+  }
+
+  function updateReport(report_id, department_id, issue_object) {
+    return new Promise((resolve, reject) => {
+      if (!report_id || !department_id
+      || !issue_object || !(issue_object instanceof Issue)) {
+        reject(new Error("Failed to update report with invalid parameters"));
+        return;
+      }
+      if (!db) {
+        reject(new Error("Failed to update report as database isn't ready"));
+        return;
+      }
+
+      db.run(`UPDATE tblReport SET
+        department_id = ${department_id},
+        issue_id = ${issue_object.issue_id},
+        creation_time = ${issue_object.creation_time},
+        data = ${issue_object.option_values}
+        WHERE id = ${report_id}`,
+        (err) => {
+          if (err) {
+            reject(new Error(`Failed to update report ${report_id}, error: ${err.message}`));
+            return;
+          }
+          resolve();
+        });
+    });
   }
 
   // Execute initilization with Service construction
   init();
 
   return {
+    addReport: addReport,
+    removeReport: removeReport,
     onDestroy: destroy
   };
 })

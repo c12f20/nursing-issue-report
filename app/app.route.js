@@ -2,7 +2,7 @@
 
 nirApp.config(['$stateProvider', '$urlRouterProvider',
   function($stateProvider, $urlRouterProvider) {
-    $urlRouterProvider.otherwise('root');
+    $urlRouterProvider.otherwise('/');
 
     $stateProvider
       .state('root', {
