@@ -8,7 +8,7 @@
     "rebuild": "electron-rebuild -f -s -v 1.8.4"
   },
   "author": "hill.cen",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "electron": "^1.8.4"
   },
