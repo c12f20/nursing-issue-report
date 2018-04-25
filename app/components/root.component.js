@@ -6,6 +6,6 @@ nirControllers.controller('RootController', ['$scope', '$state', 'DbService',
     $state.go('root.home');
     // onDestroy clear everything
     $scope.$on("$destroy", () => {
-      dbService.onDestroy();
+      dbService.destroy();
     });
   }]);

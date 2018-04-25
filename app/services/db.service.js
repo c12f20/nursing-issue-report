@@ -106,13 +106,21 @@ nirServices.factory('DbService', function() {
   }
 
   function init() {
-    __getDatabaseVersion().then((db_version) => {
-      console.log(`Current Database version ${db_version}`);
-      __alertDatabase(db_version);
-    }, (err) => {
-      console.warn(err.message);
-      __alertDatabase(DB_VERSION_INVALID);
-    });
+    return new Promise((resolve, reject) => {
+      if (db) {
+        resolve(db);
+        return;
+      }
+      __getDatabaseVersion().then((db_version) => {
+        console.log(`Current Database version ${db_version}`);
+        __alertDatabase(db_version);
+        resolve(db);
+      }, (err) => {
+        console.warn(err.message);
+        __alertDatabase(DB_VERSION_INVALID);
+        resolve(db);
+      });
+    })
   }
 
   // Destroy Database
@@ -120,86 +128,8 @@ nirServices.factory('DbService', function() {
     __closeDatabase();
   }
 
-  // Report related methods
-  function addReport(department_id, issue_object) {
-    return new Promise((resolve, reject) => {
-      if (!department_id || !issue_object
-      || !(issue_object instanceof Issue)) {
-        reject(new Error("Failed to add report with invalid parameters"));
-        return;
-      }
-      if (!db) {
-        reject(new Error("Failed to add report as database isn't ready"));
-        return;
-      }
-      db.run(`INSERT INTO tblReport (department_id, issue_id, creation_time, data)
-        VALUES (${department_id}, ${issue_object.issue_id}, ${issue_object.creation_time}, ${issue_object.option_values})`,
-        (err) => {
-          if (err) {
-            reject(new Error(`Failed to add report, error: ${err.message}`));
-            return;
-          }
-          resolve();
-        });
-    });
-  }
-
-  function removeReport(report_id) {
-    return new Promise((resolve, reject) => {
-      if (!report_id) {
-        reject(new Error("Failed to remove report with invalid report id"));
-        return;
-      }
-      if (!db) {
-        reject(new Error("Failed to remove report as database isn't ready"));
-        return;
-      }
-
-      db.run(`DELETE FROM tblReport where id = ${report_id}`,
-        (err) => {
-          if (err) {
-            reject(new Error(`Failed to remove report ${report_id}, error: ${err.message}`));
-            return;
-          }
-          resolve();
-        });
-    });
-  }
-
-  function updateReport(report_id, department_id, issue_object) {
-    return new Promise((resolve, reject) => {
-      if (!report_id || !department_id
-      || !issue_object || !(issue_object instanceof Issue)) {
-        reject(new Error("Failed to update report with invalid parameters"));
-        return;
-      }
-      if (!db) {
-        reject(new Error("Failed to update report as database isn't ready"));
-        return;
-      }
-
-      db.run(`UPDATE tblReport SET
-        department_id = ${department_id},
-        issue_id = ${issue_object.issue_id},
-        creation_time = ${issue_object.creation_time},
-        data = ${issue_object.option_values}
-        WHERE id = ${report_id}`,
-        (err) => {
-          if (err) {
-            reject(new Error(`Failed to update report ${report_id}, error: ${err.message}`));
-            return;
-          }
-          resolve();
-        });
-    });
-  }
-
-  // Execute initilization with Service construction
-  init();
-
   return {
-    addReport: addReport,
-    removeReport: removeReport,
-    onDestroy: destroy
+    create: init,
+    destroy: destroy
   };
 })
