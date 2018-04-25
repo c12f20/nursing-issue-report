@@ -29,8 +29,7 @@ nirServices.factory('DbService', function() {
             id integer PRIMARY KEY,
             issue_id integer NOT NULL,
             name text NOT NULL,
-            type integer NOT NULL,
-            option_values text,
+            option_values text NOT NULL,
             FOREIGN KEY(issue_id) REFERENCES tblIssue (id)
             ON DELETE CASCADE ON UPDATE NO ACTION)`) // Table Option
           .run(`CREATE TABLE tblReport (
@@ -38,11 +37,19 @@ nirServices.factory('DbService', function() {
             department_id integer NOT NULL,
             issue_id integer NOT NULL,
             creation_time integer NOT NULL,
-            data text,
             FOREIGN KEY(department_id) REFERENCES tblDepartment (id)
             ON DELETE CASCADE ON UPDATE NO ACTION,
             FOREIGN KEY(issue_id) REFERENCES tblIssue (id)
             ON DELETE CASCADE ON UPDATE NO ACTION)`) // Table Report
+          .run(`CREATE TABLE tblReportDetail (
+            id integer PRIMARY KEY,
+            report_id integer NOT NULL,
+            option_id integer NOT NULL,
+            option_value text NOT NULL,
+            FOREIGN KEY(report_id) REFERENCES tblReport (id)
+            ON DELETE CASCADE ON UPDATE NO ACTION,
+            FOREIGN KEY(option_id) REFERENCES tblOption (id)
+            ON DELETE CASCADE ON UPDATE NO ACTION)`) // Table ReportDetail
           .run(`INSERT INTO tblVersion (value)
             VALUES (${DB_VERSION_CURRENT})`)
       })
@@ -127,6 +134,8 @@ nirServices.factory('DbService', function() {
   function destroy() {
     __closeDatabase();
   }
+
+  init();
 
   return {
     create: init,
