@@ -93,12 +93,26 @@ nirServices.factory('ReportService', ['DBService',
           reject(new Error("Failed to query all reports as database isn't ready"));
           return;
         }
+        count = count ? count : -1;
         offset = offset ? offset : 0;
-        let sql = `SELECT `
-        if (count) {
-
-        }
-
+        let sql = `SELECT tblReport.id report_id,
+           tblReport.department_id department_id,
+           tblReport.issue_id issue_id,
+           tblReport.creation_time creation_timestamp,
+           tblDepartment.name department_name,
+           tblIssue.name issue_name
+         FROM tblReport
+         LEFT JOIN tblDepartment ON tblDepartment.id = tblReport.department_id
+         LEFT JOIN tblIssue ON tblIssue.id = tblReport.issue_id
+         ORDER BY tblReport.creation_time
+         LIMIT ${count} OFFSET ${offset}`
+        db.each(sql, [], (err, row) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+          
+        });
       });
     }
 
