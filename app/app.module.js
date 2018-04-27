@@ -1,8 +1,13 @@
 'use strict';
 
-const nirServices = angular.module('nirServices', ['pascalprecht.translate']);
+const nirServices = angular.module('nirServices', [
+  'pascalprecht.translate'
+]);
 
-const nirControllers = angular.module('nirControllers', ['nirServices']);
+const nirControllers = angular.module('nirControllers', [
+  'nirServices',
+  'ui.bootstrap'
+]);
 
 const nirApp = angular.module('nirApp', [
   'ngSanitize',

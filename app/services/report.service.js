@@ -1,7 +1,7 @@
 'use strict';
 
 nirServices.factory('ReportService', ['DBService',
-  function(dbService){
+  function(dbService) {
     let db = null;
     function init() {
       dbService.init().then((db_handle) => {
@@ -25,8 +25,8 @@ nirServices.factory('ReportService', ['DBService',
           reject(new Error("Failed to add report as database isn't ready"));
           return;
         }
-        db.run(`INSERT INTO tblReport (department_id, issue_id, creation_time, data)
-          VALUES (${department_id}, ${issue_object.issue_id}, ${issue_object.creation_time}, ${issue_object.option_values})`,
+        db.run(`INSERT INTO tblReport (department_id, issue_id, creation_time)
+          VALUES (${department_id}, ${issue_object.issue_id}, ${issue_object.creation_time})`,
           (err) => {
             if (err) {
               reject(new Error(`Failed to add report, error: ${err.message}`));
@@ -75,11 +75,10 @@ nirServices.factory('ReportService', ['DBService',
           department_id = ${report_object.department_id},
           issue_id = ${issue_object.issue_id},
           creation_time = ${report_object.creation_time},
-          data = ${issue_object.option_values}
           WHERE id = ${report_object.id}`,
           (err) => {
             if (err) {
-              reject(new Error(`Failed to update report ${report_id}, error: ${err.message}`));
+              reject(new Error(`Failed to update report ${report_object.id}, error: ${err.message}`));
               return;
             }
             resolve();
@@ -106,12 +105,19 @@ nirServices.factory('ReportService', ['DBService',
          LEFT JOIN tblIssue ON tblIssue.id = tblReport.issue_id
          ORDER BY tblReport.creation_time
          LIMIT ${count} OFFSET ${offset}`
-        db.each(sql, [], (err, row) => {
+        db.all(sql, [], (err, rows) => {
           if (err) {
             reject(err);
             return;
           }
-          
+          let reports = [];
+          rows.forEach((row) => {
+            let department = new Department(row.department_id, row.department_name);
+            let issue = new Issue(row.issue_id, row.issue_name);
+            let report = new Report(row.report_id, department, issue);
+            reports.push(report);
+          });
+          resolve(reports);
         });
       });
     }
@@ -119,6 +125,7 @@ nirServices.factory('ReportService', ['DBService',
     return {
       addReport: addReport,
       deleteReport: deleteReport,
-      updateReport: updateReport
+      updateReport: updateReport,
+      queryReports: queryAllReports
     }
   }]);

@@ -6,6 +6,10 @@ class Department {
     this.__name = name;
   }
 
+  get id() {
+    return this.__id;
+  }
+
   set name(name) {
     this.__name = name;
   }

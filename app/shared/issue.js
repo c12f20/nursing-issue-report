@@ -1,17 +1,13 @@
 'use strict';
 
 class Issue {
-  constructor(issue_id, options) {
+  constructor(issue_id, name) {
     this.__id = issue_id;
-    this.__options = options;
+    this.__name = name;
   }
 
   get id() {
     return this.__id;
-  }
-
-  get options() {
-    return this.__options;
   }
 
   set name(name) {
@@ -20,5 +16,13 @@ class Issue {
 
   get name() {
     this.__name;
+  }
+
+  set options(options) {
+    this.__options = options;
+  }
+
+  get options() {
+    return this.__options;
   }
 }
