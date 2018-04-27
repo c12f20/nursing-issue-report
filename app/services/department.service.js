@@ -82,16 +82,34 @@ nirServices.factory('DepartmentService', ['DbService',
       });
     }
 
-    function queryAllDepartments() {
+    function queryAllDepartments(offset, count) {
       return new Promise((resolve, reject) => {
         if (!db) {
           reject(new Error("Failed to query all departments as database isn't ready"));
           return;
         }
+        offset = offset ? offset : 0;
+        count = count ? count : -1;
+        let sql = `SELECT id, name FROM tblDepartment LIMIT ${count} OFFSET ${offset}`;
+        db.all(sql, [], (err, rows) => {
+          if (err) {
+            reject(new Error(`Failed to query all departments, error: ${err.message}`));
+            return;
+          }
+          let departments = [];
+          rows.forEach((row) => {
+            let department = new Department(row.id, row.name);
+            departments.push(department);
+          });
+          resolve(departments);
+        });
       });
     }
 
     return {
-
+      addDepartment: addDepartment,
+      removeDepartment: removeDepartment,
+      updateDepartment: updateDepartment,
+      queryDepartments: queryAllDepartments
     }
   }]);

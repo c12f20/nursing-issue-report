@@ -107,7 +107,7 @@ nirServices.factory('ReportService', ['DBService',
          LIMIT ${count} OFFSET ${offset}`
         db.all(sql, [], (err, rows) => {
           if (err) {
-            reject(err);
+            reject(new Error(`Failed to query all reports, error: ${err.message}`);
             return;
           }
           let reports = [];
