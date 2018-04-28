@@ -1,0 +1,20 @@
+.config .page-header {
+  margin-top: 5px;
+}
+
+.config .panel-heading {
+  font-size: 20px;
+}
+
+.config .message {
+  font-size: 20px;
+}
+
+.config .btn-add {
+  float: right !important;
+  width: 200px;
+}
+
+.config table .hcenter {
+  text-align: center;
+}

@@ -2,9 +2,9 @@
 
 nirServices.factory('ReportService', ['DBService',
   function(dbService) {
-    let db = null;
+    var db = null;
     function init() {
-      dbService.init().then((db_handle) => {
+      dbService.create().then((db_handle) => {
         db = db_handle;
       }, (err) => {
         console.error(`ReportService: failed to get DB Handle, error: ${err.message}`);
@@ -107,7 +107,7 @@ nirServices.factory('ReportService', ['DBService',
          LIMIT ${count} OFFSET ${offset}`
         db.all(sql, [], (err, rows) => {
           if (err) {
-            reject(new Error(`Failed to query all reports, error: ${err.message}`);
+            reject(new Error(`Failed to query all reports, error: ${err.message}`));
             return;
           }
           let reports = [];

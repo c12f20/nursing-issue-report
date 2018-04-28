@@ -24,5 +24,10 @@ nirApp.config(['$stateProvider', '$urlRouterProvider',
         url: 'demo',
         templateUrl: 'components/demo/demo.component.html',
         controller: 'AccordionDemoCtrl'
+      })
+      .state('root.config', {
+        url: 'config',
+        templateUrl: 'components/config/config.component.html',
+        controller: 'ConfigController',
       });
   }]);

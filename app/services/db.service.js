@@ -134,9 +134,7 @@ nirServices.factory('DbService', function() {
   function destroy() {
     __closeDatabase();
   }
-
-  init();
-
+  
   return {
     create: init,
     destroy: destroy
