@@ -4,6 +4,11 @@
 
 .config .panel-heading {
   font-size: 20px;
+  cursor: pointer;
+}
+
+.config .panel-heading a {
+  text-decoration: none;
 }
 
 .config .message {
@@ -15,6 +20,10 @@
   width: 200px;
 }
 
-.config table .hcenter {
+.config .table .hcenter {
   text-align: center;
+}
+
+.config .table > tbody > tr > td {
+  vertical-align: middle;
 }
