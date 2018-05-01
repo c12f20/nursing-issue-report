@@ -12,7 +12,7 @@ nirControllers.controller('ConfigController', ['$scope', 'DepartmentService',
         return;
       }
       $scope.department_list.forEach((department) => {
-        department.checked = $scope.department_panel.checkedAll;
+        department.checked = $scope.departments_info.checkedAll;
       });
     }
 
@@ -49,16 +49,42 @@ nirControllers.controller('ConfigController', ['$scope', 'DepartmentService',
       console.log('Add new Department');
     }
 
+    const DEPARTMENT_COUNT_PER_PAGE = 5;
+    const DEPARTMENT_MAX_COUNT_PAGES = 5;
+    $scope.departments_info = {
+      checkedAll: false,
+      count_per_page: DEPARTMENT_COUNT_PER_PAGE,
+      max_count_pages: DEPARTMENT_MAX_COUNT_PAGES,
+      total_count: 0,
+      cur_page: 1,
+    }
+
+    function query_departments_info() {
+      departmentService.queryDepartmentsCount()
+        .then((count) => {
+          $scope.departments_info.total_count = count;
+          load_departments_page_at($scope.departments_info.cur_page);
+        }, (err) => {
+          console.error(err);
+        });
+    }
+
     $scope.department_list = undefined;
-    function load_departments() {
-      departmentService.queryDepartments()
+    function load_departments_page_at(page_index) {
+      let offset = (page_index-1) * $scope.departments_info.count_per_page;
+      let count = $scope.departments_info.count_per_page;
+      departmentService.queryDepartments(offset, count)
         .then((list) => {
+          $scope.departments_info.checkedAll = false;
           $scope.department_list = list;
         }, (err) => {
           console.error(err);
         });
     }
 
+    $scope.onDepartmentPageChanged = function() {
+      load_departments_page_at($scope.departments_info.cur_page);
+    }
 
-    load_departments();
+    query_departments_info();
   }]);

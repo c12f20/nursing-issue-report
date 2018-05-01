@@ -11,6 +11,8 @@ nirApp.config(['$translateProvider',
       CAPTION_DELETE: "删除",
       CAPTION_DELETE_SELECTED: "删除选中",
       CAPTION_ACTION: "操作",
+      CAPTION_NEXT_PAGE: "下一页",
+      CAPTION_PREV_PAGE: "上一页",
       // Config UI
       TITLE_CONFIG: "配置",
       CAPTION_DEPARTMENT_LIST: "部门列表",

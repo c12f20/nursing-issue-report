@@ -35,6 +35,28 @@ nirServices.factory('DepartmentService', ['$q', 'DbService',
       return deferred.promise;
     }
 
+    function __removeDepartments(departments_id_array) {
+      let deferred = $q.defer();
+      if (!departments_id_array) {
+        deferred.reject(new Error("Failed to remove departments with invalid departments id array"));
+        return deferred.promise;
+      }
+      __init().then((db) => {
+        let ids = departments_id_array.join();
+        let sql = `DELETE FROM tblDepartment WHERE id IN (${ids})`;
+        db.run(sql, [],
+          (err) => {
+            if (err) {
+              deferred.reject(new Error(`Failed to remove departments ${ids}, error: ${err.message}`));
+              return;
+            }
+            deferred.resolve();
+          });
+      }, (err) => {
+        deferred.reject(err);
+      });
+      return deferred.promise;
+    }
 
     function __removeDepartment(department_id) {
       let deferred = $q.defer();
@@ -83,10 +105,28 @@ nirServices.factory('DepartmentService', ['$q', 'DbService',
       return deferred.promise;
     }
 
+    function __queryAllDepartmentsCount() {
+      let deferred = $q.defer();
+      __init().then((db) => {
+        let sql = "SELECT count(id) total_count FROM tblDepartment";
+        db.get(sql, [], (err, row) => {
+          if (err) {
+            deferred.reject(new Error(`Failed to query count of all departments, error: ${err.message}`));
+            return;
+          }
+          deferred.resolve(row.total_count);
+        })
+      }, (err) => {
+        deferred.reject(err);
+      });
+      return deferred.promise;
+    }
+
     function __queryAllDepartments(offset, count) {
       let deferred = $q.defer();
 
       __init().then((db) => {
+        console.log(`Query departments offset: ${offset}, count: ${count}`);
         offset = offset ? offset : 0;
         count = count ? count : -1;
         let sql = `SELECT id, name FROM tblDepartment LIMIT ${count} OFFSET ${offset}`;
@@ -111,7 +151,9 @@ nirServices.factory('DepartmentService', ['$q', 'DbService',
     return {
       addDepartment: __addDepartment,
       removeDepartment: __removeDepartment,
+      removeDepartments: __removeDepartments,
       updateDepartment: __updateDepartment,
+      queryDepartmentsCount: __queryAllDepartmentsCount,
       queryDepartments: __queryAllDepartments
     };
   }]);

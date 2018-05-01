@@ -23,24 +23,34 @@
           <thead>
             <tr>
               <th width="5%" class="hcenter">
-                <input type="checkbox" ng-model="department_panel.checkedAll" ng-change="onCheckAll()">
+                <input type="checkbox" ng-model="departments_info.checkedAll" ng-change="onCheckAll()">
               </th>
               <th width="10%" class="hcenter">{{'CAPTION_INDEX' | translate}}</th>
-              <th width="75%">{{'CAPTION_DEPARTMENT_NAME' | translate}}</th>
-              <th width="10%" class="hcenter">{{'CAPTION_ACTION' | translate}}</th>
+              <th width="65%">{{'CAPTION_DEPARTMENT_NAME' | translate}}</th>
+              <th width="20%" class="hcenter">{{'CAPTION_ACTION' | translate}}</th>
             </tr>
           </thead>
           <tbody>
             <tr ng-repeat="department in department_list">
               <td class="hcenter"><input type="checkbox" ng-model="department.checked"></th>
-              <td class="hcenter">{{$index}}</td>
+              <td class="hcenter">{{(departments_info.cur_page-1) * departments_info.count_per_page + $index + 1}}</td>
               <td>{{department.name}}</td>
               <td class="hcenter">
+                <button class="btn btn-info" ng-click="onViewDepartment($index)">{{'CAPTION_VIEW' | translate}}</button>
                 <button class="btn btn-danger" ng-click="onDeleteDepartment($index)">{{'CAPTION_DELETE' | translate}}</button>
               </td>
             </tr>
           </tbody>
         </table>
+        <ul uib-pagination ng-if="departments_info.total_count > departments_info.count_per_page"
+          total-items="departments_info.total_count"
+          items-per-page="departments_info.count_per_page"
+          ng-model="departments_info.cur_page"
+          ng-change="onDepartmentPageChanged()"
+          max-size="departments_info.max_count_pages"
+          boundary-link-numbers="true"
+          next-text="{{'CAPTION_NEXT_PAGE' | translate}}"
+          previous-text="{{'CAPTION_PREV_PAGE' | translate}}" ></ul>
       </div>
     </div>
   </uib-accordion>
