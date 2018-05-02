@@ -35,6 +35,7 @@ nirControllers.controller('ConfigController', ['$scope', '$filter', 'ngDialog', 
 
     function showDeleteDepartmentConfirmDialog(remove_departments_array) {
       $scope.dialog_info.title = $filter('translate')('CAPTION_DELETE_DEPARTMENT');
+      $scope.dialog_info.to_remove_departments_list = remove_departments_array;
       dialog_id = ngDialog.open({
         template: "components/config/department-remove-dlg-template.html",
         scope: $scope,

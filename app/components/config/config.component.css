@@ -37,9 +37,17 @@
   font-size: 20px;
 }
 
+.department-dialog-content .content {
+  font-size: 20px;
+}
+
 .department-dialog-content .content input[text] {
   width: 100%;
-  margin-top: 5px;
+  margin-top: 10px;
+}
+
+.department-dialog-content .content ul {
+  margin-top: 10px;
 }
 
 .department-dialog-content .buttons {
