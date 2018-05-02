@@ -7,6 +7,8 @@ nirApp.config(['$translateProvider',
       CAPTION_NO: "否",
       CAPTION_INDEX: "序号",
       CAPTION_ADD: "添加",
+      CAPTION_UPDATE: "更新",
+      CAPTION_EDIT: "编辑",
       CAPTION_VIEW: "查看",
       CAPTION_DELETE: "删除",
       CAPTION_DELETE_SELECTED: "删除选中",
@@ -18,7 +20,11 @@ nirApp.config(['$translateProvider',
       CAPTION_DEPARTMENT_LIST: "部门列表",
       CAPTION_DEPARTMENT_NAME: "部门名称",
       MSG_NO_DEPARTMENT_DATA: "未找到任何部门，请添加！",
-      CAPTION_ADD_DEPARTMENT: "添加部门"
+      CAPTION_ADD_DEPARTMENT: "添加部门",
+      CAPTION_EDIT_DEPARTMENT: "编辑部门",
+      CAPTION_DELETE_DEPARTMENT: "删除部门",
+      HINT_INPUT_DEPARTMENT_NAME: "请输入部门名称",
+      MSG_REMOVE_DEPARTMENTS_CONFIRM: "请确认是否删除如下部门：",
     };
 
     $translateProvider

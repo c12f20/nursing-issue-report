@@ -6,7 +6,8 @@ const nirServices = angular.module('nirServices', [
 
 const nirControllers = angular.module('nirControllers', [
   'nirServices',
-  'ui.bootstrap'
+  'ui.bootstrap',
+  'ngDialog',
 ]);
 
 const nirApp = angular.module('nirApp', [

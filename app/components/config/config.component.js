@@ -1,34 +1,19 @@
 'use strict';
 
-nirControllers.controller('ConfigController', ['$scope', 'DepartmentService',
-  function($scope, departmentService) {
+nirControllers.controller('ConfigController', ['$scope', '$filter', 'ngDialog', 'DepartmentService',
+  function($scope, $filter, ngDialog, departmentService) {
     $scope.department_panel = {
       open: false,
     };
 
     // Department List
+    // About checkbox on the list
     $scope.onCheckAll = function() {
       if (!$scope.department_list || $scope.department_list.length == 0) {
         return;
       }
       $scope.department_list.forEach((department) => {
         department.checked = $scope.departments_info.checkedAll;
-      });
-    }
-
-    $scope.onDeleteDepartment = function(index) {
-      let department = $scope.department_list[index];
-      console.log(`Delete Department ${department.name}`);
-    }
-
-    $scope.onDeleteCheckedDepartments = function() {
-      if (!$scope.department_list || $scope.department_list.length == 0) {
-        return;
-      }
-      $scope.department_list.forEach((department) => {
-        if (department.checked) {
-          console.log(`Delete Department ${department.name}`);
-        }
       });
     }
 
@@ -44,11 +29,117 @@ nirControllers.controller('ConfigController', ['$scope', 'DepartmentService',
       }
       return false;
     }
+    // Department related Dialog
+    let dialog_id = undefined;
+    $scope.dialog_info = {};
+
+    function showDeleteDepartmentConfirmDialog(remove_departments_array) {
+      $scope.dialog_info.title = $filter('translate')('CAPTION_DELETE_DEPARTMENT');
+      dialog_id = ngDialog.open({
+        template: "components/config/department-remove-dlg-template.html",
+        scope: $scope,
+      });
+    }
+
+    function onRemoveDialogConfirm(isYes) {
+
+    }
+
+    $scope.isEditDataValid = function() {
+      if ($scope.dialog_info.department_object) {
+        return $scope.dialog_info.department_name && $scope.dialog_info.department_name.length > 0 && $scope.dialog_info.department_object.name != $scope.dialog_info.department_name;
+      } else {
+        return $scope.dialog_info.department_name && $scope.dialog_info.department_name.length > 0;
+      }
+    }
+
+    $scope.onEditDialogConfirm = function() {
+      if (!$scope.dialog_info.department_name || $scope.dialog_info.department_name.length == 0) {
+        dismissEditDepartmentDialog();
+        return;
+      }
+
+      if ($scope.dialog_info.department_object) {
+        if ($scope.dialog_info.department_object.name == $scope.dialog_info.department_name) {
+          dismissEditDepartmentDialog();
+          return;
+        }
+        $scope.dialog_info.department_object.name = $scope.dialog_info.department_name;
+        departmentService.updateDepartment($scope.dialog_info.department_object).then(() => {
+          query_departments_info();
+        }, (err) => {
+          console.error(err);
+        }).finally(() => {
+          dismissEditDepartmentDialog();
+        });
+      } else {
+        departmentService.addDepartment($scope.dialog_info.department_name).then(() => {
+          query_departments_info();
+        }, (err) => {
+          console.error(err);
+        }).finally(() => {
+          dismissEditDepartmentDialog();
+        });
+      }
+    }
+
+    function showEditDepartmentDialog(department_object) {
+      if (department_object) {
+        $scope.dialog_info.title = $filter('translate')('CAPTION_EDIT_DEPARTMENT');
+        $scope.dialog_info.department_object = department_object;
+        $scope.dialog_info.department_name = department_object.name;
+        $scope.dialog_info.button_caption = $filter('translate')('CAPTION_UPDATE');
+      } else {
+        $scope.dialog_info.title = $filter('translate')('CAPTION_ADD_DEPARTMENT');
+        $scope.dialog_info.department_object = undefined;
+        $scope.dialog_info.department_name = "";
+        $scope.dialog_info.button_caption = $filter('translate')('CAPTION_ADD');
+      }
+      dialog_id = ngDialog.open({
+        template: "components/config/department-edit-dlg-template.html",
+        scope: $scope,
+      });
+    }
+
+    function dismissEditDepartmentDialog() {
+      if (dialog_id) {
+        ngDialog.close(dialog_id);
+      }
+    }
+
+    // methods of action buttons
+    $scope.onDeleteDepartment = function(index) {
+      let department = $scope.department_list[index];
+      console.log(`Delete Department ${department.name}`);
+      showDeleteDepartmentConfirmDialog([department]);
+    }
+
+    $scope.onDeleteCheckedDepartments = function() {
+      if (!$scope.department_list || $scope.department_list.length == 0) {
+        return;
+      }
+      let to_remove_list = [];
+      $scope.department_list.forEach((department) => {
+        if (department.checked) {
+          console.log(`Delete Department ${department.name}`);
+          to_remove_list.push(department);
+        }
+      });
+      showDeleteDepartmentConfirmDialog(to_remove_list);
+    }
 
     $scope.onAddDepartment = function() {
       console.log('Add new Department');
+      showEditDepartmentDialog();
     }
 
+    $scope.onEditDepartment = function(index) {
+      let department = $scope.department_list[index];
+      console.log(`Delete Department ${department.name}`);
+      showEditDepartmentDialog(department);
+    }
+
+    // Load departments list methods
     const DEPARTMENT_COUNT_PER_PAGE = 5;
     const DEPARTMENT_MAX_COUNT_PAGES = 5;
     $scope.departments_info = {
@@ -63,6 +154,10 @@ nirControllers.controller('ConfigController', ['$scope', 'DepartmentService',
       departmentService.queryDepartmentsCount()
         .then((count) => {
           $scope.departments_info.total_count = count;
+          let total_pages_count = Math.ceil(count / $scope.departments_info.count_per_page);
+          if ($scope.departments_info.cur_page > total_pages_count) {
+            $scope.departments_info.cur_page = total_pages_count;
+          }
           load_departments_page_at($scope.departments_info.cur_page);
         }, (err) => {
           console.error(err);

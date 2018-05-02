@@ -1,0 +1,13 @@
+<div class="department-dialog-content">
+  <h2>{{dialog_info.title}}</h2>
+  <div class="content">
+    {{'MSG_REMOVE_DEPARTMENTS_CONFIRM' | translate}}
+    <ul>
+      <li ng-repeat="department in dialog_info.to_remove_departments_list">{{department.name}}</li>
+    </ul>
+  </div>
+  <div class="buttons">
+    <button class="btn btn-primary btn-double" ng-click="onRemoveDialogConfirm(true)" >{{'CAPTION_YES' | translate}}</button>
+    <button class="btn btn-primary btn-double" ng-click="onRemoveDialogConfirm(false)" >{{'CAPTION_NO' | translate}}</button>
+  </div>
+</div>

@@ -36,7 +36,7 @@
               <td class="hcenter">{{(departments_info.cur_page-1) * departments_info.count_per_page + $index + 1}}</td>
               <td>{{department.name}}</td>
               <td class="hcenter">
-                <button class="btn btn-info" ng-click="onViewDepartment($index)">{{'CAPTION_VIEW' | translate}}</button>
+                <button class="btn btn-info" ng-click="onEditDepartment($index)">{{'CAPTION_EDIT' | translate}}</button>
                 <button class="btn btn-danger" ng-click="onDeleteDepartment($index)">{{'CAPTION_DELETE' | translate}}</button>
               </td>
             </tr>

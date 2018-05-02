@@ -89,7 +89,7 @@ nirServices.factory('DepartmentService', ['$q', 'DbService',
       }
       __init().then((db) => {
         let sql = `UPDATE tblDepartment SET
-          name = ${department_object.name}
+          name = '${department_object.name}'
           WHERE id = ${department_object.id}`;
         db.run(sql, [],
           (err) => {
