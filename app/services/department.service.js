@@ -35,6 +35,28 @@ nirServices.factory('DepartmentService', ['$q', 'DbService',
       return deferred.promise;
     }
 
+    function __removeDepartment(department_id) {
+      let deferred = $q.defer();
+      if (!department_id) {
+        deferred.reject(new Error("Failed to remove department with invalid department id"));
+        return deferred.promise;
+      }
+      __init().then((db) => {
+        let sql = "DELETE FROM tblDepartment WHERE id=?";
+        db.run(sql, department_id,
+          (err) => {
+            if (err) {
+              deferred.reject(new Error(`Failed to remove department ${department_id}, error: ${err.message}`));
+              return;
+            }
+            deferred.resolve();
+          });
+      }, (err) => {
+        deferred.reject(err);
+      });
+      return deferred.promise;
+    }
+
     function __removeDepartments(departments_id_array) {
       let deferred = $q.defer();
       if (!departments_id_array) {
@@ -48,28 +70,6 @@ nirServices.factory('DepartmentService', ['$q', 'DbService',
           (err) => {
             if (err) {
               deferred.reject(new Error(`Failed to remove departments ${ids}, error: ${err.message}`));
-              return;
-            }
-            deferred.resolve();
-          });
-      }, (err) => {
-        deferred.reject(err);
-      });
-      return deferred.promise;
-    }
-
-    function __removeDepartment(department_id) {
-      let deferred = $q.defer();
-      if (!department_id) {
-        deferred.reject(new Error("Failed to remove department with invalid department id"));
-        return deferred.promise;
-      }
-      __init().then((db) => {
-        let sql = "DELETE FROM tblDepartment WHERE id=?";
-        db.run(sql, department_id,
-          (err) => {
-            if (err) {
-              deferred.reject(new Error(`Failed to remove department ${department_id}, error: ${err.message}`));
               return;
             }
             deferred.resolve();

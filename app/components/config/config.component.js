@@ -42,8 +42,23 @@ nirControllers.controller('ConfigController', ['$scope', '$filter', 'ngDialog', 
       });
     }
 
-    function onRemoveDialogConfirm(isYes) {
-
+    $scope.onRemoveDialogConfirm = function(isYes) {
+      if (!isYes) {
+        dismissEditDepartmentDialog();
+        return;
+      }
+      let to_remove_departments_ids = [];
+      $scope.dialog_info.to_remove_departments_list.forEach((department) => {
+        to_remove_departments_ids.push(department.id);
+      });
+      departmentService.removeDepartments(to_remove_departments_ids)
+        .then(() => {
+          query_departments_info();
+        }, (err) => {
+          console.error(err);
+        }).finally(() => {
+          dismissEditDepartmentDialog();
+        });
     }
 
     $scope.isEditDataValid = function() {

@@ -1,6 +1,7 @@
 'use strict';
 
 const sqlite3 = require('sqlite3').verbose();
+const TransactionDatabase = require('sqlite3-transactions').TransactionDatabase;
 const fs = require('fs');
 
 nirServices.factory('DbService', function() {
@@ -10,7 +11,7 @@ nirServices.factory('DbService', function() {
   // Construct database
   var db = null;
   function __createDatabase() {
-    db = new sqlite3.Database(DB_PATH, sqlite3.OPEN_CREATE | sqlite3.OPEN_READWRITE, (err) => {
+    db = new TransactionDatabase(new sqlite3.Database(DB_PATH, sqlite3.OPEN_CREATE | sqlite3.OPEN_READWRITE, (err) => {
       if (err) {
         console.error(err.message);
         return;
@@ -53,7 +54,7 @@ nirServices.factory('DbService', function() {
           .run(`INSERT INTO tblVersion (value)
             VALUES (${DB_VERSION_CURRENT})`)
       })
-    });
+    }));
   }
 
   function __alertDatabase(db_version) {
@@ -134,7 +135,7 @@ nirServices.factory('DbService', function() {
   function destroy() {
     __closeDatabase();
   }
-  
+
   return {
     create: init,
     destroy: destroy

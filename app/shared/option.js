@@ -43,4 +43,11 @@ class Option {
       return undefined;
     }
   }
+
+  equals(other) {
+    if (!other || !(option_object instanceof Option)) {
+      return false;
+    }
+    return this.__id == other.id && this.__name == other.name && this.__value_names == other.value_names;
+  }
 }
