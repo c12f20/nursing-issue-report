@@ -45,9 +45,10 @@ class Option {
   }
 
   equals(other) {
-    if (!other || !(option_object instanceof Option)) {
+    if (!other || !(other instanceof Option)) {
       return false;
     }
-    return this.__id == other.id && this.__name == other.name && this.__value_names == other.value_names;
+    return this.__id == other.id && this.__name == other.name
+      && JSON.stringify(this.__value_names) == JSON.stringify(other.value_names);
   }
 }

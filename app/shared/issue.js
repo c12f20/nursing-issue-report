@@ -25,4 +25,25 @@ class Issue {
   get options() {
     return this.__options;
   }
+
+  equals(other) {
+    if (!other || !(other instanceof Issue)) {
+      return false;
+    }
+    if (this.__options && other.options) {
+      if (this.__options.length != other.options.length) {
+        return false;
+      }
+      for (let i=0; i < this.__options.length; i++) {
+        if(!this.__options[i].equals(other.options[i]) {
+          return false;
+        }
+      }
+    } else {
+      if (this.__options && !other.options || !this.__options && other.options) {
+        return false;
+      }
+    }
+    return this.__id == other.__id && this.__name == other.name;
+  }
 }
