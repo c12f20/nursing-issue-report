@@ -109,10 +109,38 @@ nirServices.factory('OptionService', ['$q', 'DbService',
       return deferred.promise;
     }
 
+    function __queryOptionsByIssueId(issue_id) {
+      let deferred = $q.defer();
+      if (!issue_id) {
+        deferred.reject(new Error("Failed to query options with invalid issue id"));
+        return deferred.promise;
+      }
+      __init().then((db) => {
+        let sql = "SELECT id, name, option_values FROM tblOption WHERE issue_id = ?";
+        db.all(sql, [issue_id], (err, rows) => {
+          if (err) {
+            deferred.reject(new Error(`Failed to query all options by issue id: ${issue_id}, error: ${err.message}`));
+            return;
+          }
+          let options = [];
+          rows.forEach((row) => {
+            let option_values = JSON.parse(row.option_values);
+            let option = new Option(row.id, row.name, option_values);
+            options.push(option);
+          });
+          deferred.resolve(options);
+        });
+      }, (err) => {
+        deferred.reject(err);
+      });
+      return deferred.promise;
+    }
+
     return {
       addOption: __addOption,
       removeOption: __removeOption,
       removeOptions: __removeOptions,
       updateOption: __updateOption,
+      queryIssueOptions: __queryOptionsByIssueId,
     }
   }]);

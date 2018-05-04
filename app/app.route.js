@@ -15,11 +15,6 @@ nirApp.config(['$stateProvider', '$urlRouterProvider',
         templateUrl: 'components/home/home.component.html',
         controller: 'HomeController'
       })
-      .state('root.issues', {
-        url: 'issues',
-        templateUrl: 'components/issues/issues.component.html',
-        controller: 'IssuesController'
-      })
       .state('root.demo', {
         url: 'demo',
         templateUrl: 'components/demo/demo.component.html',
@@ -28,6 +23,14 @@ nirApp.config(['$stateProvider', '$urlRouterProvider',
       .state('root.config', {
         url: 'config',
         templateUrl: 'components/config/config.component.html',
-        controller: 'ConfigController',
+        controller: 'ConfigController'
+      })
+      .state('root.issue_detail', {
+        url: 'issue_detail',
+        params: {
+          issue_object: undefined,
+        },
+        templateUrl: 'components/config/issue_detail/issue_detail.component.html',
+        controller: 'IssueDetailController'
       });
   }]);

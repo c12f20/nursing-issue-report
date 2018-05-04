@@ -15,7 +15,7 @@ class Issue {
   }
 
   get name() {
-    this.__name;
+    return this.__name;
   }
 
   set options(options) {
@@ -35,7 +35,7 @@ class Issue {
         return false;
       }
       for (let i=0; i < this.__options.length; i++) {
-        if(!this.__options[i].equals(other.options[i]) {
+        if (!this.__options[i].equals(other.options[i])) {
           return false;
         }
       }

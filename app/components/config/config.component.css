@@ -28,36 +28,36 @@
   vertical-align: middle;
 }
 
-.department-dialog-content h2 {
+.dialog-content h2 {
   margin-top: 10px;
   margin-bottom: 20px;
 }
 
-.department-dialog-content .content {
+.dialog-content .content {
   font-size: 20px;
 }
 
-.department-dialog-content .content {
+.dialog-content .content {
   font-size: 20px;
 }
 
-.department-dialog-content .content input[text] {
+.dialog-content .content input[text] {
   width: 100%;
   margin-top: 10px;
 }
 
-.department-dialog-content .content ul {
+.dialog-content .content ul {
   margin-top: 10px;
 }
 
-.department-dialog-content .buttons {
+.dialog-content .buttons {
   text-align: center;
 }
 
-.department-dialog-content .buttons .btn-single {
+.dialog-content .buttons .btn-single {
   width: 50%;
 }
 
-.department-dialog-content .buttons .btn-double {
+.dialog-content .buttons .btn-double {
   width: 40%;
 }

@@ -23,7 +23,7 @@
           <thead>
             <tr>
               <th width="5%" class="hcenter">
-                <input type="checkbox" ng-model="departments_info.checkedAll" ng-change="onCheckAll()">
+                <input type="checkbox" ng-model="departments_info.checkedAll" ng-change="onCheckAllDepartments()">
               </th>
               <th width="10%" class="hcenter">{{'CAPTION_INDEX' | translate}}</th>
               <th width="65%">{{'CAPTION_DEPARTMENT_NAME' | translate}}</th>
@@ -54,5 +54,56 @@
       </div>
     </div>
     <!-- Issue Panel -->
+    <div uib-accordion-group class="panel panel-default" is-open="issue_panel.open" template-url="components/config/group-template.html">
+      <uib-accordion-heading>
+        {{'CAPTION_ISSUE_LIST' | translate}} <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': issue_panel.open, 'glyphicon-chevron-right': !issue_panel.open}"></i>
+      </uib-accordion-heading>
+      <!-- No Data View -->
+      <div ng-if="!issue_list || issue_list.length == 0">
+        <div class="message">
+          {{'MSG_NO_ISSUE_DATA' | translate}}
+          <button class="btn btn-primary btn-add" ng-click="onAddIssue()">{{'CAPTION_ADD_ISSUE' | translate}}</button>
+        </div>
+      </div>
+      <!-- Data View -->
+      <div ng-if="issue_list && issue_list.length > 0">
+        <p>
+          <button class="btn btn-danger" ng-click="onDeleteCheckedIssues()" ng-disabled="!hasCheckedIssues()">{{'CAPTION_DELETE_SELECTED' | translate}}</button>
+          <button class="btn btn-primary" ng-click="onAddIssue()">{{'CAPTION_ADD_ISSUE' | translate}}</button>
+        </p>
+        <table class="table table-striped table-bordered">
+          <thead>
+            <tr>
+              <th width="5%" class="hcenter">
+                <input type="checkbox" ng-model="issues_info.checkedAll" ng-change="onCheckAllIssues()">
+              </th>
+              <th width="10%" class="hcenter">{{'CAPTION_INDEX' | translate}}</th>
+              <th width="65%">{{'CAPTION_ISSUE_NAME' | translate}}</th>
+              <th width="20%" class="hcenter">{{'CAPTION_ACTION' | translate}}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="issue in issue_list">
+              <td class="hcenter"><input type="checkbox" ng-model="issue.checked"></th>
+              <td class="hcenter">{{(issues_info.cur_page-1) * issues_info.count_per_page + $index + 1}}</td>
+              <td>{{issue.name}}</td>
+              <td class="hcenter">
+                <button class="btn btn-info" ng-click="onEditIssue($index)">{{'CAPTION_EDIT' | translate}}</button>
+                <button class="btn btn-danger" ng-click="onDeleteIssue($index)">{{'CAPTION_DELETE' | translate}}</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul uib-pagination ng-if="issues_info.total_count > issues_info.count_per_page"
+          total-items="issues_info.total_count"
+          items-per-page="issues_info.count_per_page"
+          ng-model="issues_info.cur_page"
+          ng-change="onIssuePageChanged()"
+          max-size="issues_info.max_count_pages"
+          boundary-link-numbers="true"
+          next-text="{{'CAPTION_NEXT_PAGE' | translate}}"
+          previous-text="{{'CAPTION_PREV_PAGE' | translate}}" ></ul>
+      </div>
+    </div>
   </uib-accordion>
 </div>

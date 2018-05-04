@@ -1,9 +1,9 @@
-<div class="department-dialog-content">
+<div class="dialog-content">
   <h2>{{dialog_info.title}}</h2>
   <div class="content">
-    {{'MSG_REMOVE_DEPARTMENTS_CONFIRM' | translate}}
+    {{dialog_info.remove_data_note}}
     <ul>
-      <li ng-repeat="department in dialog_info.to_remove_departments_list">{{department.name}}</li>
+      <li ng-repeat="item in dialog_info.to_remove_list">{{item.name}}</li>
     </ul>
   </div>
   <div class="buttons">

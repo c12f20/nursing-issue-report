@@ -180,12 +180,73 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
     }
 
     function __queryAllIssuesCount() {
-
+      let deferred = $q.defer();
+      __init().then((db) => {
+        let sql = "SELECT count(id) total_count FROM tblIssue";
+        db.get(sql, [], (err, row) => {
+          if (err) {
+            deferred.reject(new Error(`Failed to query count of all issues, error: ${err.message}`));
+            return;
+          }
+          deferred.resolve(row.total_count);
+        })
+      }, (err) => {
+        deferred.reject(err);
+      });
+      return deferred.promise;
     }
 
     function __queryAllIssues(offset, count) {
+      let deferred = $q.defer();
 
+      __init().then((db) => {
+        console.log(`Query issues offset: ${offset}, count: ${count}`);
+        offset = offset ? offset : 0;
+        count = count ? count : -1;
+        let sql = `SELECT id, name FROM tblIssue LIMIT ${count} OFFSET ${offset}`;
+        db.all(sql, [], (err, rows) => {
+          if (err) {
+            deferred.reject(new Error(`Failed to query all issues, error: ${err.message}`));
+            return;
+          }
+          let issues = [];
+          rows.forEach((row) => {
+            let issue = new Issue(row.id, row.name);
+            issues.push(issue);
+          });
+          deferred.resolve(issues);
+        });
+      }, (err) => {
+        deferred.reject(err);
+      });
+      return deferred.promise;
     }
 
+    function __queryIssueDetail(issue_object) {
+      let deferred = $q.defer();
+      if (!issue_object || !(issue_object instanceof Issue)
+      || !issue_object.id) {
+        deferred.reject(new Error("Failed to query issue detail with invalid issue object"));
+        return deferred.promise;
+      }
 
+      optionService.queryIssueOptions(issue_object.id)
+        .then((options) => {
+          issue_object.options = options;
+          deferred.resolve(issue_object);
+        }, (err) => {
+          deferred.reject(err);
+        });
+      return deferred.promise;
+    }
+
+    return {
+      addIssue: __addIssue,
+      removeIssue: __removeIssue,
+      removeIssues: __removeIssues,
+      updateIssue: __updateIssue,
+      queryIssuesCount: __queryAllIssuesCount,
+      queryIssues: __queryAllIssues,
+      queryIssueDetail: __queryIssueDetail,
+    }
   }]);
