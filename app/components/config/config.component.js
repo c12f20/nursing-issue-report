@@ -77,7 +77,11 @@ nirControllers.controller('ConfigController', ['$scope', '$filter', '$state', 'n
       }
     }
 
-    $scope.onEditDialogConfirm = function() {
+    $scope.onEditDialogConfirm = function(isYes) {
+      if (!isYes) {
+        dismissDialog();
+        return;
+      }
       if (!$scope.dialog_info.department_name || $scope.dialog_info.department_name.length == 0) {
         dismissDialog();
         return;

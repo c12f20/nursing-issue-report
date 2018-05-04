@@ -1,4 +1,10 @@
 <div class="config">
   <h1 class="page-header">{{page_info.title}}</h1>
-
+  <form>
+    <div class="form-group">
+      <label for="issueNameInput">{{'CAPTION_ISSUE_NAME' | translate}}</label>
+      <input text class="form-control" id="issueNameInput"
+        placeholder="{{'HINT_INPUT_ISSUE_NAME' | translate}}" ng-model="issue_object.name">
+    </div>
+  </form>
 </div>

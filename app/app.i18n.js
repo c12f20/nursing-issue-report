@@ -8,6 +8,7 @@ nirApp.config(['$translateProvider',
       CAPTION_INDEX: "序号",
       CAPTION_ADD: "添加",
       CAPTION_UPDATE: "更新",
+      CAPTION_CANCEL: "取消",
       CAPTION_EDIT: "编辑",
       CAPTION_VIEW: "查看",
       CAPTION_DELETE: "删除",
@@ -33,6 +34,8 @@ nirApp.config(['$translateProvider',
       CAPTION_DELETE_ISSUE: "删除事件",
       HINT_INPUT_ISSUE_NAME: "请输入事件名称",
       MSG_REMOVE_ISSUE_CONFIRM: "请确认是否删除如下事件：",
+      // Issue Detail UI
+      HINT_INPUT_ISSUE_NAME: "请输入事件名称",
     };
 
     $translateProvider

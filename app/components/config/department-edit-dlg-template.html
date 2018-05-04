@@ -2,9 +2,10 @@
   <h2>{{dialog_info.title}}</h2>
   <div class="content">
     {{'CAPTION_DEPARTMENT_NAME' | translate}}
-    <input text class="ngdialog-input" ng-model="dialog_info.department_name" placeholder="{{'HINT_INPUT_DEPARTMENT_NAME' | translate}}"/>
+    <input text class="form-control" ng-model="dialog_info.department_name" placeholder="{{'HINT_INPUT_DEPARTMENT_NAME' | translate}}"/>
   </div>
   <div class="buttons">
-    <button class="btn btn-primary btn-single" ng-click="onEditDialogConfirm()" ng-disabled="!isEditDataValid()">{{dialog_info.button_caption}}</button>
+    <button class="btn btn-primary btn-double" ng-click="onEditDialogConfirm(true)" ng-disabled="!isEditDataValid()">{{dialog_info.button_caption}}</button>
+    <button class="btn btn-danger btn-double" ng-click="onEditDialogConfirm(false)" >{{'CAPTION_CANCEL' | translate}}</button>
   </div>
 </div>
