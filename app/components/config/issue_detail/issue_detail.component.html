@@ -4,7 +4,44 @@
     <div class="form-group">
       <label for="issueNameInput">{{'CAPTION_ISSUE_NAME' | translate}}</label>
       <input text class="form-control" id="issueNameInput"
-        placeholder="{{'HINT_INPUT_ISSUE_NAME' | translate}}" ng-model="issue_object.name">
+        placeholder="{{'HINT_INPUT_ISSUE_NAME' | translate}}" ng-model="issue_object.name" />
     </div>
   </form>
+  <!-- No Option Data View -->
+  <div ng-if="!options_list || options_list.length == 0">
+    <button class="btn btn-primary" ng-click="onAddOption()">{{'CAPTION_ADD_OPTION' | translate}}</button>
+  </div>
+  <div class="panel panel-default" ng-if="options_list && options_list.length > 0">
+    <div class="panel-heading">{{'CAPTION_OPTIONS_LIST' | translate}}</div>
+    <div class="panel-body">
+      <!-- Option Data View -->
+      <p>
+        <button class="btn btn-danger" ng-click="onDeleteCheckedOptions()" ng-disabled="!hasCheckedOptions()">{{'CAPTION_DELETE_SELECTED' | translate}}</button>
+        <button class="btn btn-primary" ng-click="onAddOption()">{{'CAPTION_ADD_OPTION' | translate}}</button>
+      </p>
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th width="5%" class="hcenter">
+              <input type="checkbox" ng-model="options_info.checkedAll" ng-change="onCheckAllOptions()">
+            </th>
+            <th width="10%" class="hcenter">{{'CAPTION_INDEX' | translate}}</th>
+            <th width="65%">{{'CAPTION_OPTION_NAME' | translate}}</th>
+            <th width="20%" class="hcenter">{{'CAPTION_ACTION' | translate}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="option in options_list">
+            <td class="hcenter"><input type="checkbox" ng-model="option.checked"></th>
+            <td class="hcenter">{{(options_info.cur_page-1) * options_info.count_per_page + $index + 1}}</td>
+            <td>{{option.name}}</td>
+            <td class="hcenter">
+              <button class="btn btn-info" ng-click="onEditOption($index)">{{'CAPTION_EDIT' | translate}}</button>
+              <button class="btn btn-danger" ng-click="onDeleteOption($index)">{{'CAPTION_DELETE' | translate}}</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>

@@ -36,6 +36,10 @@ nirApp.config(['$translateProvider',
       MSG_REMOVE_ISSUE_CONFIRM: "请确认是否删除如下事件：",
       // Issue Detail UI
       HINT_INPUT_ISSUE_NAME: "请输入事件名称",
+      CAPTION_OPTIONS_LIST: "统计项目列表",
+      CAPTION_ADD_OPTION: "添加统计项目",
+      CAPTION_OPTION_NAME: "统计项名称",
+
     };
 
     $translateProvider

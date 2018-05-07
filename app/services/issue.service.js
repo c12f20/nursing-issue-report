@@ -240,7 +240,17 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
       return deferred.promise;
     }
 
+    let editing_issue = undefined;
+    function __setEditIssue(issue_object) {
+      editing_issue = issue_object;
+    }
+
+    function __getEditIssue() {
+      return editing_issue;
+    }
+
     return {
+      // Database part
       addIssue: __addIssue,
       removeIssue: __removeIssue,
       removeIssues: __removeIssues,
@@ -248,5 +258,8 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
       queryIssuesCount: __queryAllIssuesCount,
       queryIssues: __queryAllIssues,
       queryIssueDetail: __queryIssueDetail,
+      // For UI usage
+      setEditIssue: __setEditIssue,
+      getEditIssue: __getEditIssue,
     }
   }]);
