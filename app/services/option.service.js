@@ -116,17 +116,27 @@ nirServices.factory('OptionService', ['$q', 'DbService',
         return deferred.promise;
       }
       __init().then((db) => {
-        let sql = "SELECT id, name, option_values FROM tblOption WHERE issue_id = ?";
+        let sql = "SELECT id, option_index, name, option_values FROM tblOption WHERE issue_id = ? ORDER BY option_index ASC";
         db.all(sql, [issue_id], (err, rows) => {
           if (err) {
             deferred.reject(new Error(`Failed to query all options by issue id: ${issue_id}, error: ${err.message}`));
             return;
           }
           let options = [];
+          let cur_option = undefined;
           rows.forEach((row) => {
             let option_values = JSON.parse(row.option_values);
             let option = new Option(row.id, row.name, option_values);
-            options.push(option);
+            if (Math.floor(row.option_index) == row.option_index) { // it's integer, so it's a 1st level option
+              options.push(option);
+              cur_option = option;
+            } else { // it contains decimal, so it's 2nd level option
+              if (cur_option.children) {
+                cur_option.children.push(option);
+              } else {
+                cur_option.children = [option];
+              }
+            }
           });
           deferred.resolve(options);
         });

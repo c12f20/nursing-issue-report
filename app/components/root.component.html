@@ -1,7 +1,7 @@
 <div class="container root-container">
   <div class="row root-container">
     <div class="list-group col-xs-2">
-      <a ng-repeat="menu in menu_list" ng-href="{{menu.href}}"
+      <a ng-repeat="menu in menu_list" ui-sref="{{menu.href}}"
         ng-click="onMenuClicked(menu)" class="list-group-item"
         ng-class="{'active': menu.index == selected_index}">{{menu.name | translate}}</a>
     </div>

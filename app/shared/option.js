@@ -6,6 +6,7 @@ class Option {
     this.__name = name;
     this.__value_names = value_names;
     this.__value_index = 0; // first value always be default one
+    this.__children = null;
   }
 
   get id() {
@@ -28,6 +29,14 @@ class Option {
     return this.__value_names;
   }
 
+  set children(options) {
+    this.__children = options;
+  }
+
+  get children() {
+    return this.__children;
+  }
+
   set value_index(index) {
     this.__value_index = index;
   }
@@ -42,6 +51,10 @@ class Option {
     } else {
       return undefined;
     }
+  }
+
+  is_calculable() {
+    return this.__value_names && this.__value_names.length > 0;
   }
 
   equals(other) {

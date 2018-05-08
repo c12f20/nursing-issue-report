@@ -18,7 +18,7 @@ nirApp.config(['$stateProvider', '$urlRouterProvider',
       .state('root.demo', {
         url: 'demo',
         templateUrl: 'components/demo/demo.component.html',
-        controller: 'AccordionDemoCtrl'
+        controller: 'treeGridController'
       })
       .state('root.config', {
         url: 'config',

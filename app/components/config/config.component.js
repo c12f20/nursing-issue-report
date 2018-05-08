@@ -2,16 +2,6 @@
 
 nirControllers.controller('ConfigController', ['$scope', '$filter', '$state', 'ngDialog', 'DepartmentService', 'IssueService',
   function($scope, $filter, $state, ngDialog, departmentService, issueService) {
-    // Dialog related methods
-    let dialog_id = undefined;
-    $scope.dialog_info = {};
-
-    function dismissDialog() {
-      if (dialog_id) {
-        ngDialog.close(dialog_id);
-      }
-    }
-
     // Department Panel
     $scope.department_panel = {
       open: false,
@@ -39,20 +29,18 @@ nirControllers.controller('ConfigController', ['$scope', '$filter', '$state', 'n
       return false;
     }
     // Department related dialogs
+    $scope.dialog_info = {};
     function showDeleteDepartmentConfirmDialog(remove_departments_array) {
       $scope.dialog_info.title = $filter('translate')('CAPTION_DELETE_DEPARTMENT');
       $scope.dialog_info.remove_data_note = $filter('translate')('MSG_REMOVE_DEPARTMENTS_CONFIRM');
       $scope.dialog_info.to_remove_list = remove_departments_array;
       $scope.onRemoveDialogConfirm = onRemoveDepartmentDialogConfirm;
-      dialog_id = ngDialog.open({
-        template: "components/config/remove-dlg-template.html",
-        scope: $scope,
-      });
+      $scope.showDialog($scope, "components/config/remove-dlg-template.html");
     }
 
     function onRemoveDepartmentDialogConfirm(isYes) {
       if (!isYes) {
-        dismissDialog();
+        $scope.dismissDialog();
         return;
       }
       let to_remove_departments_ids = [];
@@ -65,7 +53,7 @@ nirControllers.controller('ConfigController', ['$scope', '$filter', '$state', 'n
         }, (err) => {
           console.error(err);
         }).finally(() => {
-          dismissDialog();
+          $scope.dismissDialog();
         });
     }
 
@@ -79,17 +67,17 @@ nirControllers.controller('ConfigController', ['$scope', '$filter', '$state', 'n
 
     $scope.onEditDialogConfirm = function(isYes) {
       if (!isYes) {
-        dismissDialog();
+        $scope.dismissDialog();
         return;
       }
       if (!$scope.dialog_info.department_name || $scope.dialog_info.department_name.length == 0) {
-        dismissDialog();
+        $scope.dismissDialog();
         return;
       }
 
       if ($scope.dialog_info.department_object) {
         if ($scope.dialog_info.department_object.name == $scope.dialog_info.department_name) {
-          dismissDialog();
+          $scope.dismissDialog();
           return;
         }
         $scope.dialog_info.department_object.name = $scope.dialog_info.department_name;
@@ -98,7 +86,7 @@ nirControllers.controller('ConfigController', ['$scope', '$filter', '$state', 'n
         }, (err) => {
           console.error(err);
         }).finally(() => {
-          dismissDialog();
+          $scope.dismissDialog();
         });
       } else {
         departmentService.addDepartment($scope.dialog_info.department_name).then(() => {
@@ -106,7 +94,7 @@ nirControllers.controller('ConfigController', ['$scope', '$filter', '$state', 'n
         }, (err) => {
           console.error(err);
         }).finally(() => {
-          dismissDialog();
+          $scope.dismissDialog();
         });
       }
     }
@@ -123,10 +111,7 @@ nirControllers.controller('ConfigController', ['$scope', '$filter', '$state', 'n
         $scope.dialog_info.department_name = "";
         $scope.dialog_info.button_caption = $filter('translate')('CAPTION_ADD');
       }
-      dialog_id = ngDialog.open({
-        template: "components/config/department-edit-dlg-template.html",
-        scope: $scope,
-      });
+      $scope.showDialog($scope, "components/config/department-edit-dlg-template.html");
     }
 
     // methods of action buttons
@@ -245,7 +230,7 @@ nirControllers.controller('ConfigController', ['$scope', '$filter', '$state', 'n
 
     function onRemoveIssueDialogConfirm(isYes) {
       if (!isYes) {
-        dismissDialog();
+        $scope.dismissDialog();
         return;
       }
       let to_remove_issues_ids = [];
@@ -258,7 +243,7 @@ nirControllers.controller('ConfigController', ['$scope', '$filter', '$state', 'n
         }, (err) => {
           console.error(err);
         }).finally(() => {
-          dismissDialog();
+          $scope.dismissDialog();
         });
     }
     // methods of action buttons

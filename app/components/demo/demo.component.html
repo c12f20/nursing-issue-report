@@ -1,60 +1,28 @@
-<div ng-controller="AccordionDemoCtrl">
-  <script type="text/ng-template" id="group-template.html">
-    <div class="panel-heading">
-      <h4 class="panel-title" style="color:#fa39c3">
-        <a href tabindex="0" class="accordion-toggle" ng-click="toggleOpen()" uib-accordion-transclude="heading">
-          <span uib-accordion-header ng-class="{'text-muted': isDisabled}">
-            {{heading}}
-          </span>
-        </a>
-      </h4>
-    </div>
-    <div class="panel-collapse collapse" uib-collapse="!isOpen">
-      <div class="panel-body" style="text-align: right" ng-transclude></div>
-    </div>
-  </script>
-
-  <p>
-    <button type="button" class="btn btn-default btn-sm" ng-click="status.open = !status.open">Toggle last panel</button>
-    <button type="button" class="btn btn-default btn-sm" ng-click="status.isFirstDisabled = ! status.isFirstDisabled">Enable / Disable first panel</button>
-  </p>
-
-  <div class="checkbox">
-    <label>
-      <input type="checkbox" ng-model="oneAtATime">
-      Open only one at a time
-    </label>
+<div ng-controller="treeGridController" style="margin:20px">
+  <div class="row container">
+      <h1 class="text-center">tree-grid</h1>
+      <h4 class=" text-center text-info">trap tree in a grid</h4>
+      <p class="text-center"><a class="btn btn-success" href="https://github.com/khan4019/tree-grid-directive">code on github</a> <a class="btn btn-default" href="https://github.com/khan4019/tree-grid-directive/blob/master/README.md">show step by step</a></p>
   </div>
-  <uib-accordion close-others="oneAtATime">
-    <div uib-accordion-group class="panel-default" heading="Static Header, initially expanded" is-open="status.isFirstOpen" is-disabled="status.isFirstDisabled">
-      This content is straight in the template.
-    </div>
-    <div uib-accordion-group class="panel-default" heading="{{group.title}}" ng-repeat="group in groups">
-      {{group.content}}
-    </div>
-    <div uib-accordion-group class="panel-default" heading="Dynamic Body Content">
-      <p>The body of the uib-accordion group grows to fit the contents</p>
-      <button type="button" class="btn btn-default btn-sm" ng-click="addItem()">Add Item</button>
-      <div ng-repeat="item in items">{{item}}</div>
-    </div>
-    <div uib-accordion-group class="panel-default" heading="Custom template" template-url="group-template.html">
-      Hello
-    </div>
-    <div uib-accordion-group class="panel-default" is-open="status.isCustomHeaderOpen" template-url="group-template.html">
-      <uib-accordion-heading>
-        Custom template with custom header template <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.isCustomHeaderOpen, 'glyphicon-chevron-right': !status.isCustomHeaderOpen}"></i>
-      </uib-accordion-heading>
-      World
-    </div>
-    <div uib-accordion-group class="panel-danger" heading="Delete account">
-      <p>Please, to delete your account, click the button below</p>
-      <button class="btn btn-danger">Delete</button>
-    </div>
-    <div uib-accordion-group class="panel-default" is-open="status.open">
-      <uib-accordion-heading>
-        I can have markup, too! <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-      </uib-accordion-heading>
-      This is just some content to illustrate fancy headings.
-    </div>
-  </uib-accordion>
+  <div ng-model="showMinDir" ng-value="false">
+
+      <button ng-click="showMinDir=false" class="btn btn-primary btn-sm">Use standard directive</button>
+      <button ng-click="showMinDir=true" class="btn btn-primary btn-sm">Use minimum directive</button>
+      <br/><br/>
+      <div ng-show="!showMinDir">
+          <strong>standard directive: </strong><code>&lt;tree-grid tree-data="tree_data" tree-control="my_tree" col-defs="col_defs" expand-on="expanding_property" on-select="my_tree_handler(branch)" expand-level="2" icon-leaf= "glyphicon glyphicon-globe"&gt;&lt;/tree-grid&gt;</code>
+          <br/>
+          <br/>
+          <button ng-click="my_tree.expand_all()" class="btn btn-default btn-sm">Expand All</button>
+          <button ng-click="my_tree.collapse_all()" class="btn btn-default btn-sm">Collapse All</button>
+          <input class="input-sm pull-right" type="text" data-ng-model="filterString"	placeholder="Filter" />
+          <tree-grid tree-data="tree_data" tree-control="my_tree" col-defs="col_defs" expand-on="expanding_property" on-select="my_tree_handler(branch)" expand-level="2" icon-leaf= "glyphicon glyphicon-globe"></tree-grid>
+      </div>
+      <div ng-show="showMinDir">
+          <strong>bare minimum directive:</strong> <code>&lt;tree-grid tree-data="tree_data"&gt;&lt;/tree-grid&gt;</code>
+          <br/>
+          <br/>
+          <tree-grid tree-data="tree_data"></tree-grid>
+      </div>
+  </div>
 </div>
