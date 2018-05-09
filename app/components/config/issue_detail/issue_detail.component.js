@@ -21,8 +21,78 @@ nirControllers.controller('IssueDetailController', ['$scope', '$stateParams', '$
 
       });
     }
+    // Save/Cancel buttons
+    $scope.isIssueChanged = function() {
+
+      let result = $scope.issue_object.equals(issueService.getEditingIssue());
+      if (issueService.getEditingIssue()) {
+        console.log("Issue name: "+$scope.issue_object.name+", Original name:"+issueService.getEditingIssue().name+" result: "+result);
+      }
+      return !result;
+    }
 
     // Option Tree view
+    $scope.options_info = {
+      checkedAll: false,
+    }
+
+    $scope.expanding_property = {
+      field: "index",
+      displayName: $filter('translate')('CAPTION_INDEX'),
+      cellTemplate: '<span class="tree-label" ng-click="user_clicks_branch(row.branch)">{{row.branch[expandingProperty.field]}}</span>'
+    };
+    $scope.col_defs = [
+      {
+        field: "checked",
+        displayName: $filter('translate')('CAPTION_CHECKED'),
+        cellTemplate: '<input type="checkbox" ng-model="row.branch.checked" ng-change="cellTemplateScope.onOptionCheckedChanged(row.branch)" />',
+        cellTemplateScope: $scope
+      },
+      {
+        field: "name",
+        displayName: $filter('translate')('CAPTION_OPTION_NAME'),
+        cellTemplate: '<span class="tree-label" ng-click="user_clicks_branch(row.branch)">{{row.branch[col.field]}}</span>'
+      },
+      {
+        field: "id",
+        displayName: $filter('translate')('CAPTION_ACTION'),
+        cellTemplate: '<button class="btn btn-info" ng-click="cellTemplateScope.onEditOption(row.branch)">{{"CAPTION_EDIT" | translate}}</button> \
+        <button class="btn btn-danger" ng-click="cellTemplateScope.onDeleteOption(row.branch)">{{"CAPTION_DELETE" | translate}}</button>',
+        cellTemplateScope: $scope
+      }
+    ];
+    // Move Selected status related methods
+    let cur_selected_option = undefined;
+    $scope.onOptionSingleSelected = function(option) {
+      cur_selected_option = option;
+    }
+
+    $scope.canMoveSelectOptionUp = function() {
+      if (!cur_selected_option) {
+        return false;
+      }
+      return cur_selected_option.index > 1;
+    }
+
+    $scope.canMoveSelectOptionDown = function() {
+      if (!cur_selected_option) {
+        return false;
+      }
+      if (cur_selected_option.parent_name) { // it's child option
+        let parent_option = find_parent_option_by_name(cur_selected_option.parent_name);
+        return cur_selected_option.index < parent_option.children.length;
+      } else {
+        return cur_selected_option.index < $scope.options_list.length;
+      }
+    }
+
+    $scope.onMoveOptionUp = function() {
+      if (!cur_selected_option) {
+        return;
+      }
+
+    }
+    // Delete checked status related methods
     function isOptionChecked(option) {
       if (!option) {
         return false;
@@ -54,31 +124,6 @@ nirControllers.controller('IssueDetailController', ['$scope', '$stateParams', '$
       return false;
     }
 
-    $scope.options_list = undefined;
-    $scope.options_info = {
-      checkedAll: false,
-    }
-
-    $scope.expanding_property = {
-      field: "name",
-      displayName: $filter('translate')('CAPTION_OPTION_NAME')
-    };
-    $scope.col_defs = [
-      {
-        field: "checked",
-        displayName: $filter('translate')('CAPTION_CHECKED'),
-        cellTemplate: '<input type="checkbox" ng-model="row.branch.checked" ng-change="cellTemplateScope.onOptionCheckedChanged(row.branch)" />',
-        cellTemplateScope: $scope
-      },
-      {
-        field: "id",
-        displayName: $filter('translate')('CAPTION_ACTION'),
-        cellTemplate: '<button class="btn btn-info" ng-click="cellTemplateScope.onEditOption(row.branch)">{{"CAPTION_EDIT" | translate}}</button> \
-        <button class="btn btn-danger" ng-click="cellTemplateScope.onDeleteOption(row.branch)">{{"CAPTION_DELETE" | translate}}</button>',
-        cellTemplateScope: $scope
-      }
-    ];
-
     $scope.onOptionCheckedChanged = function(option) {
       if (option.children) {
         option.children.forEach((option_child) => {
@@ -99,11 +144,26 @@ nirControllers.controller('IssueDetailController', ['$scope', '$stateParams', '$
     $scope.page_info = {
       title: undefined,
     }
+    $scope.options_list = undefined;
+    function find_parent_option_by_name(name) {
+      if (!$scope.options_list) {
+        return undefined;
+      }
+      for (let i=0; i < $scope.options_list.length; i++) {
+        let option = $scope.options_list[i];
+        if (option.name == name) {
+          return option;
+        }
+      }
+      return undefined;
+    }
 
     $scope.issue_object = new Issue(undefined, "");
     function query_issue_details(issue) {
       issueService.queryIssueDetail(issue)
         .then((issue_object) => {
+          // Save original editing issue data
+          issueService.setEditingIssue(issue_object.clone());
           $scope.issue_object = issue_object;
           $scope.options_list = $scope.issue_object.options;
         }, (err) => {
@@ -116,11 +176,16 @@ nirControllers.controller('IssueDetailController', ['$scope', '$stateParams', '$
       if ($stateParams.issue_object && ($stateParams.issue_object instanceof Issue)) {
         if ($stateParams.issue_object.id) {
           $scope.page_info.title = $filter('translate')('CAPTION_EDIT_ISSUE');
-          query_issue_details($stateParams.issue_object);
+          if (!$stateParams.issue_object.options) {
+            query_issue_details($stateParams.issue_object);
+          }
         } else {
           $scope.issue_object = $stateParams.issue_object;
           $scope.options_list = $scope.issue_object.options;
         }
+      } else {
+        // Mark original editing issue data undefined for "New Issue" use case
+        issueService.setEditingIssue(undefined);
       }
     }
 

@@ -128,9 +128,12 @@ nirServices.factory('OptionService', ['$q', 'DbService',
             let option_values = JSON.parse(row.option_values);
             let option = new Option(row.id, row.name, option_values);
             if (Math.floor(row.option_index) == row.option_index) { // it's integer, so it's a 1st level option
+              option.index = Math.floor(row.option_index);
               options.push(option);
               cur_option = option;
             } else { // it contains decimal, so it's 2nd level option
+              option.parent_name = cur_option.name;
+              option.index = Math.round((row.option_index-Math.floor(row.option_index)) * 100);
               if (cur_option.children) {
                 cur_option.children.push(option);
               } else {

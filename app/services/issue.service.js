@@ -241,11 +241,11 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
     }
 
     let editing_issue = undefined;
-    function __setEditIssue(issue_object) {
+    function __setEditingIssue(issue_object) {
       editing_issue = issue_object;
     }
 
-    function __getEditIssue() {
+    function __getEditingIssue() {
       return editing_issue;
     }
 
@@ -259,7 +259,7 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
       queryIssues: __queryAllIssues,
       queryIssueDetail: __queryIssueDetail,
       // For UI usage
-      setEditIssue: __setEditIssue,
-      getEditIssue: __getEditIssue,
+      setEditingIssue: __setEditingIssue,
+      getEditingIssue: __getEditingIssue,
     }
   }]);

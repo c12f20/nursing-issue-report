@@ -30,6 +30,9 @@ class Issue {
     if (!other || !(other instanceof Issue)) {
       return false;
     }
+    if (!(this.__id == other.__id && this.__name == other.name)) {
+      return false;
+    }
     if (this.__options && other.options) {
       if (this.__options.length != other.options.length) {
         return false;
@@ -44,6 +47,19 @@ class Issue {
         return false;
       }
     }
-    return this.__id == other.__id && this.__name == other.name;
+    return true;
+  }
+
+  clone() {
+    let new_obj = new Issue(this.__id, this.__name);
+    if (this.__options) {
+      let new_options = [];
+      for (let i=0; i < this.__options.length; i++) {
+        let new_option = this.__options[i].clone();
+        new_options.push(new_option);
+      }
+      new_obj.options = new_options;
+    }
+    return new_obj;
   }
 }

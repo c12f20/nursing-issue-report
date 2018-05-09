@@ -18,6 +18,8 @@ nirApp.config(['$translateProvider',
       CAPTION_ACTION: "操作",
       CAPTION_NEXT_PAGE: "下一页",
       CAPTION_PREV_PAGE: "上一页",
+      CAPTION_MOVE_UP: "上移",
+      CAPTION_MOVE_DOWN: "下移",
       // Config UI
       TITLE_CONFIG: "配置",
       CAPTION_DEPARTMENT_LIST: "部门列表",

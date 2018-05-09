@@ -1,7 +1,7 @@
 <div class="config">
   <h1 class="page-header">{{page_info.title}}</h1>
   <p class="btn-double-group">
-    <button class="btn btn-primary" ng-click="onSaveIssue()" ng-disabled="!isOptionChanged()">{{'CAPTION_SAVE' | translate}}</button>
+    <button class="btn btn-primary" ng-click="onSaveIssue()" ng-disabled="!isIssueChanged()">{{'CAPTION_SAVE' | translate}}</button>
     <button class="btn btn-danger" ng-click="onCancel()" >{{'CAPTION_CANCEL' | translate}}</button>
   </p>
   <div class="panel panel-default">
@@ -19,11 +19,13 @@
     <div class="panel-heading">{{'CAPTION_OPTIONS_LIST' | translate}}</div>
     <div class="panel-body">
       <!-- Option Data View -->
-      <p>
+      <p class="panel-btn-group">
         <button class="btn btn-danger" ng-click="onDeleteCheckedOptions()" ng-disabled="!hasCheckedOptions()">{{'CAPTION_DELETE_SELECTED' | translate}}</button>
         <button class="btn btn-primary" ng-click="onAddOption()">{{'CAPTION_ADD_OPTION' | translate}}</button>
+        <button class="btn btn-default" ng-click="onMoveOptionUp()" ng-disabled="!canMoveSelectOptionUp()">{{'CAPTION_MOVE_UP' | translate}}</button>
+        <button class="btn btn-default" ng-click="onMoveOptionDown()" ng-disabled="!canMoveSelectOptionDown()">{{'CAPTION_MOVE_DOWN' | translate}}</button>
       </p>
-      <tree-grid tree-data="options_list" col-defs="col_defs" expand-on="expanding_property" icon-leaf="glyphicon glyphicon-minus"></tree-grid>
+      <tree-grid tree-data="options_list" col-defs="col_defs" expand-on="expanding_property" icon-leaf="glyphicon glyphicon-minus" on-select="onOptionSingleSelected(branch)"></tree-grid>
     </div>
   </div>
 </div>

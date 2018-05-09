@@ -15,7 +15,7 @@
       </div>
       <!-- Data View -->
       <div ng-if="department_list && department_list.length > 0">
-        <p>
+        <p class="panel-btn-group">
           <button class="btn btn-danger" ng-click="onDeleteCheckedDepartments()" ng-disabled="!hasCheckedDepartments()">{{'CAPTION_DELETE_SELECTED' | translate}}</button>
           <button class="btn btn-primary" ng-click="onAddDepartment()">{{'CAPTION_ADD_DEPARTMENT' | translate}}</button>
         </p>
@@ -67,7 +67,7 @@
       </div>
       <!-- Data View -->
       <div ng-if="issue_list && issue_list.length > 0">
-        <p>
+        <p class="panel-btn-group">
           <button class="btn btn-danger" ng-click="onDeleteCheckedIssues()" ng-disabled="!hasCheckedIssues()">{{'CAPTION_DELETE_SELECTED' | translate}}</button>
           <button class="btn btn-primary" ng-click="onAddIssue()">{{'CAPTION_ADD_ISSUE' | translate}}</button>
         </p>

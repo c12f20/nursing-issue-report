@@ -29,6 +29,10 @@
   vertical-align: middle;
 }
 
+.config .panel-btn-group button {
+  width: 15%;
+}
+
 .config .btn-double-group button {
   width: 49%;
 }
