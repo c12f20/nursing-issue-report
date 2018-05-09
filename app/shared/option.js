@@ -10,7 +10,7 @@ class Option {
       throw new Error("value_names of Option can't be undefined");
     }
     this.__value_index = 0; // first value always be default one
-    this.__children = null;
+    this.__children = [];
   }
 
   get id() {
@@ -85,17 +85,12 @@ class Option {
     && JSON.stringify(this.__value_names) == JSON.stringify(other.value_names))) {
       return false;
     };
-    if (this.__children && other.children) {
-      if (this.__children.length != other.children.length) {
-        return false;
-      }
-      for (let i=0; i < this.__children.length; i++) {
-        if (!this.__children[i].equals(other.children[i])) {
-          return false;
-        }
-      }
-    } else {
-      if (this.__children && !other.children || !this.__children && other.children) {
+
+    if (this.__children.length != other.children.length) {
+      return false;
+    }
+    for (let i=0; i < this.__children.length; i++) {
+      if (!this.__children[i].equals(other.children[i])) {
         return false;
       }
     }
@@ -116,5 +111,6 @@ class Option {
       }
       new_obj.children = new_children;
     }
+    return new_obj;
   }
 }

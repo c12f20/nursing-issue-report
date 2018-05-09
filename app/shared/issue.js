@@ -43,7 +43,8 @@ class Issue {
         }
       }
     } else {
-      if (this.__options && !other.options || !this.__options && other.options) {
+      if (this.__options && this.__options.length > 0 && !other.options
+        || !this.__options && other.options && other.options.length > 0) {
         return false;
       }
     }

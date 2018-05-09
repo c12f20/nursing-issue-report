@@ -43,6 +43,8 @@ nirApp.config(['$translateProvider',
       CAPTION_OPTIONS_LIST: "统计项目列表",
       CAPTION_ADD_OPTION: "添加统计项目",
       CAPTION_OPTION_NAME: "统计项名称",
+      CAPTION_DELETE_OPTION: "删除统计项目",
+      MSG_REMOVE_OPTIONS_CONFIRM: "请确认是否删除如下统计项目：",
 
     };
 

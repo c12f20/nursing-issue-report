@@ -18,17 +18,13 @@ nirControllers.controller('IssueDetailController', ['$scope', '$stateParams', '$
         return;
       }
       $scope.dialog_info.to_remove_list.forEach((option) => {
-
+        removeOptionInList(option);
       });
+      $scope.dismissDialog();
     }
     // Save/Cancel buttons
     $scope.isIssueChanged = function() {
-
-      let result = $scope.issue_object.equals(issueService.getEditingIssue());
-      if (issueService.getEditingIssue()) {
-        console.log("Issue name: "+$scope.issue_object.name+", Original name:"+issueService.getEditingIssue().name+" result: "+result);
-      }
-      return !result;
+      return !$scope.issue_object.equals(issueService.getEditingIssue());
     }
 
     // Option Tree view
@@ -42,12 +38,6 @@ nirControllers.controller('IssueDetailController', ['$scope', '$stateParams', '$
       cellTemplate: '<span class="tree-label" ng-click="user_clicks_branch(row.branch)">{{row.branch[expandingProperty.field]}}</span>'
     };
     $scope.col_defs = [
-      {
-        field: "checked",
-        displayName: $filter('translate')('CAPTION_CHECKED'),
-        cellTemplate: '<input type="checkbox" ng-model="row.branch.checked" ng-change="cellTemplateScope.onOptionCheckedChanged(row.branch)" />',
-        cellTemplateScope: $scope
-      },
       {
         field: "name",
         displayName: $filter('translate')('CAPTION_OPTION_NAME'),
@@ -92,52 +82,40 @@ nirControllers.controller('IssueDetailController', ['$scope', '$stateParams', '$
       }
 
     }
-    // Delete checked status related methods
-    function isOptionChecked(option) {
-      if (!option) {
-        return false;
+    // Delete related methods
+    function removeOptionInList(remove_option) {
+      if (!$scope.options_list || $scope.options_list.length == 0) {
+        return;
       }
-      if (option.checked) {
-        return true;
+      let remove_index = $scope.options_list.indexOf(remove_option);
+      if (remove_index >= 0) {
+        $scope.options_list.splice(remove_index, 1);
+        return;
       }
-      if (option.children && option.children.length > 0) {
-        for (let i=0; i < option.children.length; i++) {
-          let option_child = option.children[i];
-          if (isOptionChecked(option_child)) {
-            return true;
+      for (let i=0; i < $scope.options_list.length; i++) {
+        let option = $scope.options_list[i];
+        if (option.children.length > 0) {
+          remove_index = option.children.indexOf(remove_option);
+          if (remove_index >= 0) {
+            option.children.splice(remove_index, 1);
+            return;
           }
         }
       }
       return false;
     }
 
-    $scope.hasCheckedOptions = function() {
-      if (!$scope.options_list || $scope.options_list.length == 0) {
-        return false;
-      }
-      for (let i=0; i < $scope.options_list.length; i++) {
-        let option = $scope.options_list[i];
-        if (isOptionChecked(option)) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    $scope.onOptionCheckedChanged = function(option) {
-      if (option.children) {
-        option.children.forEach((option_child) => {
-          option_child.checked = option.checked;
-        });
-      }
-    }
-
-    $scope.onEditOption = function(option) {
-      console.log(`onEditOption, option: ${option.name}`);
-    }
-
     $scope.onDeleteOption = function(option) {
       console.log(`onDeleteOption, option: ${option.name}`);
+      let remove_options_array = [option];
+      option.children.forEach((child_option) => {
+        remove_options_array.push(child_option);
+      })
+      showDeleteOptionConfirmDialog(remove_options_array);
+    }
+    // Edit related methods
+    $scope.onEditOption = function(option) {
+      console.log(`onEditOption, option: ${option.name}`);
     }
 
     // Load data methods
