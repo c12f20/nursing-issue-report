@@ -12,8 +12,8 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
       })
       return deferred.promise;
     }
-
-    function __addIssueOptions(db, issue_id, options_list) {
+    // Add Issue
+    function __addIssueOptions(transaction, issue_id, options_list) {
       let deferred = $q.defer();
       if (!options_list || options_list.length == 0) {
         deferred.resolve();
@@ -21,7 +21,7 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
       }
       for (let i=0; i < options_list.length; i++) {
         option = options_list[i];
-        optionService.addOption(issue_id, option.name, option.value_names)
+        optionService.addOptionWithTransaction(transaction, issue_id, option.name, option.value_names)
           .then(() => {
             if (i == options_list.length-1) { // last element
               deferred.resolve();
@@ -33,7 +33,7 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
       return deferred.promise;
     }
 
-    function __addIssue(issue_name, options_list) {
+    function addIssue(issue_name, options_list) {
       let deferred = $q.defer();
       if (!issue_name || issue_name.length == 0) {
         deferred.reject(new Error("Failed to add issue with invalid parameters"));
@@ -47,14 +47,14 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
             return;
           }
           let sql = "INSERT INTO tblIssue (name) VALUES (?)";
-          db.run(sql, [issue_name],
-            (err) => {
+          transaction.run(sql, [issue_name],
+            function(err) {
               if (err) {
                 deferred.reject(new Error(`Failed to add issue, error: ${err.message}`));
                 return;
               }
-              __addIssueOptions(db, this.last_id, options_list).then(() => {
-                db.commit((err) => {
+              __addIssueOptions(transaction, this.lastID, options_list).then(() => {
+                transaction.commit((err) => {
                   if (err) {
                     deferred.reject(err);
                     return;
@@ -71,8 +71,8 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
       });
       return deferred.promise;
     }
-
-    function __removeIssue(issue_id) {
+    // Remove Issue
+    function removeIssue(issue_id) {
       let deferred = $q.defer();
       if (!issue_id) {
         deferred.reject(new Error("Failed to remove issue with invalid issue id"));
@@ -95,7 +95,7 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
       return deferred.promise;
     }
 
-    function __removeIssues(issues_id_array) {
+    function removeIssues(issues_id_array) {
       let deferred = $q.defer();
       if (!issues_id_array) {
         deferred.reject(new Error("Failed to remove issues with invalid issues id array"));
@@ -117,8 +117,8 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
       });
       return deferred.promise;
     }
-
-    function __updateIssueOptions(db, options_list) {
+    // Update Issue
+    function __updateIssueOptions(transaction, issue_id, options_list) {
       let deferred = $q.defer();
       if (!options_list || options_list.length == 0) {
         deferred.resolve();
@@ -126,8 +126,13 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
       }
       for (let i=0; i < options_list.length; i++) {
         option = options_list[i];
-        optionService.updateOption(option)
-          .then(() => {
+        let result;
+        if (option.id) {
+          result = optionService.updateOptionWithTransaction(transaction, option);
+        } else {
+          result = optionService.addOptionWithTransaction(transaction, issue_id, option.name, option.value_names);
+        }
+        result.then(() => {
             if (i == options_list.length-1) { // last element
               deferred.resolve();
             }
@@ -138,7 +143,7 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
       return deferred.promise;
     }
 
-    function __updateIssue(issue_object) {
+    function updateIssue(issue_object, remove_option_ids) {
       let deferred = $q.defer();
       if (!issue_object || !(issue_object instanceof Issue)
       || !issue_object.id || !issue_object.name) {
@@ -154,23 +159,27 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
           let sql = `UPDATE tblIssue SET
             name = '${issue_object.name}'
             WHERE id = ${issue_object.id}`;
-          db.run(sql, [],
+          transaction.run(sql, [],
             (err) => {
               if (err) {
                 deferred.reject(new Error(`Failed to update issue ${issue_object.id}, error: ${err.message}`));
                 return;
               }
-              __updateIssueOptions(db, issue_object.options).then(() => {
-                db.commit((err) => {
-                  if (err) {
-                    deferred.reject(err);
-                    return;
-                  }
-                  deferred.resolve();
+              optionService.removeOptionsWithTransaction(transaction, remove_option_ids)
+                .then(() => {
+                  return __updateIssueOptions(transaction, issue_object.id, issue_object.options);
                 })
-              }, (err) => {
-                deferred.reject(err);
-              });
+                .then(() => {
+                  transaction.commit((err) => {
+                    if (err) {
+                      deferred.reject(err);
+                      return;
+                    }
+                    deferred.resolve();
+                  })
+                }, (err) => {
+                  deferred.reject(err);
+                });
             });
         });
       }, (err) => {
@@ -178,8 +187,8 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
       });
       return deferred.promise;
     }
-
-    function __queryAllIssuesCount() {
+    // Query Issue
+    function queryAllIssuesCount() {
       let deferred = $q.defer();
       __init().then((db) => {
         let sql = "SELECT count(id) total_count FROM tblIssue";
@@ -196,7 +205,7 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
       return deferred.promise;
     }
 
-    function __queryAllIssues(offset, count) {
+    function queryAllIssues(offset, count) {
       let deferred = $q.defer();
 
       __init().then((db) => {
@@ -222,7 +231,7 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
       return deferred.promise;
     }
 
-    function __queryIssueDetail(issue_object) {
+    function queryIssueDetail(issue_object) {
       let deferred = $q.defer();
       if (!issue_object || !(issue_object instanceof Issue)
       || !issue_object.id) {
@@ -239,27 +248,47 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
         });
       return deferred.promise;
     }
-
+    // For UI usage
     let editing_issue = undefined;
-    function __setEditingIssue(issue_object) {
+    function setEditingIssue(issue_object) {
       editing_issue = issue_object;
+      __resetRemovedOptions();
     }
 
-    function __getEditingIssue() {
+    function getEditingIssue() {
       return editing_issue;
+    }
+
+    let removed_options = [];
+    function __resetRemovedOptions() {
+      removed_options = [];
+    }
+
+    function appendRemovedOptions(new_removed_list) {
+      new_removed_list.forEach((option) => {
+        if (option.id) {
+          removed_options.push(option.id);
+        }
+      })
+    }
+
+    function getRemovedOptionIds() {
+      return removed_options;
     }
 
     return {
       // Database part
-      addIssue: __addIssue,
-      removeIssue: __removeIssue,
-      removeIssues: __removeIssues,
-      updateIssue: __updateIssue,
-      queryIssuesCount: __queryAllIssuesCount,
-      queryIssues: __queryAllIssues,
-      queryIssueDetail: __queryIssueDetail,
+      addIssue: addIssue,
+      removeIssue: removeIssue,
+      removeIssues: removeIssues,
+      updateIssue: updateIssue,
+      queryIssuesCount: queryAllIssuesCount,
+      queryIssues: queryAllIssues,
+      queryIssueDetail: queryIssueDetail,
       // For UI usage
-      setEditingIssue: __setEditingIssue,
-      getEditingIssue: __getEditingIssue,
+      setEditingIssue: setEditingIssue,
+      getEditingIssue: getEditingIssue,
+      appendRemovedOptions: appendRemovedOptions,
+      getRemovedOptionIds: getRemovedOptionIds,
     }
   }]);

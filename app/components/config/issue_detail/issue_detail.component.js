@@ -1,7 +1,7 @@
 'use strict';
 
-nirControllers.controller('IssueDetailController', ['$scope', '$stateParams', '$filter', 'ngDialog', 'IssueService',
-  function($scope, $stateParams, $filter, ngDialog, issueService) {
+nirControllers.controller('IssueDetailController', ['$scope', '$state', '$stateParams', '$filter', 'ngDialog', 'IssueService',
+  function($scope, $state, $stateParams, $filter, ngDialog, issueService) {
     // Options related dialogs
     $scope.dialog_info = {};
     function showDeleteOptionConfirmDialog(remove_options_array) {
@@ -20,6 +20,9 @@ nirControllers.controller('IssueDetailController', ['$scope', '$stateParams', '$
       $scope.dialog_info.to_remove_list.forEach((option) => {
         removeOptionInList(option);
       });
+      if ($scope.issue_object.id) { // It's an Edit Issue, need record removed options
+        issueService.appendRemovedOptions($scope.dialog_info.to_remove_list);
+      }
       $scope.dismissDialog();
     }
     // Save/Cancel buttons
@@ -27,6 +30,27 @@ nirControllers.controller('IssueDetailController', ['$scope', '$stateParams', '$
       return !$scope.issue_object.equals(issueService.getEditingIssue());
     }
 
+    $scope.isIssueValid = function() {
+      return $scope.issue_object.name && $scope.issue_object.name.length > 0
+    }
+
+    $scope.onCancel = function() {
+      $state.go('^.config', {open_state: [false, true]});
+    }
+
+    $scope.onSaveIssue = function() {
+      let result;
+      if ($scope.issue_object.id) {
+        result = issueService.updateIssue($scope.issue_object, issueService.getRemovedOptionIds())
+      } else {
+        result = issueService.addIssue($scope.issue_object.name, $scope.issue_object.options);
+      }
+      result.then(null, (err) => {
+        console.error(err);
+      }).finally(() => {
+        $state.go('^.config', {open_state: [false, true]});
+      });
+    }
     // Option Tree view
     $scope.options_info = {
       checkedAll: false,
@@ -68,21 +92,72 @@ nirControllers.controller('IssueDetailController', ['$scope', '$stateParams', '$
       if (!cur_selected_option) {
         return false;
       }
-      if (cur_selected_option.parent_name) { // it's child option
+      if (cur_selected_option.parent_name) { // It's child option
         let parent_option = find_parent_option_by_name(cur_selected_option.parent_name);
         return cur_selected_option.index < parent_option.children.length;
-      } else {
+      } else { // It's a root option
         return cur_selected_option.index < $scope.options_list.length;
       }
+    }
+
+    function moveUpOptionInList(option, options_list) {
+      let pos = options_list.indexOf(option);
+      if (pos < 1) {
+        console.error(`Can't move up option ${option.name}`);
+        return;
+      }
+      let prev_option = options_list[pos-1];
+      let original_index = option.index;
+      option.index = prev_option.index;
+      prev_option.index = original_index;
+      options_list[pos-1] = option;
+      options_list[pos] = prev_option;
+    }
+
+    function moveDownOptionInList(option, options_list) {
+      let pos = options_list.indexOf(option);
+      if (pos >= options_list.length-1) {
+        console.error(`Can't move down option ${option.name}`);
+        return;
+      }
+      let next_option = options_list[pos+1];
+      let original_index = option.index;
+      option.index = next_option.index;
+      next_option.index = original_index;
+      options_list[pos+1] = option;
+      options_list[pos] = next_option;
     }
 
     $scope.onMoveOptionUp = function() {
       if (!cur_selected_option) {
         return;
       }
+      if (cur_selected_option.parent_name) { // It's a child option
+        let parent_option = find_parent_option_by_name(cur_selected_option.parent_name);
+        moveUpOptionInList(cur_selected_option, parent_option.children);
+      } else { // It's a root option
+        moveUpOptionInList(cur_selected_option, $scope.options_list);
+      }
+    }
 
+    $scope.onMoveOptionDown = function() {
+      if (!cur_selected_option) {
+        return;
+      }
+      if (cur_selected_option.parent_name) { // It's a child option
+        let parent_option = find_parent_option_by_name(cur_selected_option.parent_name);
+        moveDownOptionInList(cur_selected_option, parent_option.children);
+      } else { // It's a root option
+        moveDownOptionInList(cur_selected_option, $scope.options_list);
+      }
     }
     // Delete related methods
+    function updateIndexOfOptionList(options_list) {
+      for (let i=0; i < options_list.length; i++) {
+        let option = options_list[i];
+        option.index = i+1;
+      }
+    }
     function removeOptionInList(remove_option) {
       if (!$scope.options_list || $scope.options_list.length == 0) {
         return;
@@ -90,6 +165,7 @@ nirControllers.controller('IssueDetailController', ['$scope', '$stateParams', '$
       let remove_index = $scope.options_list.indexOf(remove_option);
       if (remove_index >= 0) {
         $scope.options_list.splice(remove_index, 1);
+        updateIndexOfOptionList($scope.options_list);
         return;
       }
       for (let i=0; i < $scope.options_list.length; i++) {
@@ -98,6 +174,7 @@ nirControllers.controller('IssueDetailController', ['$scope', '$stateParams', '$
           remove_index = option.children.indexOf(remove_option);
           if (remove_index >= 0) {
             option.children.splice(remove_index, 1);
+            updateIndexOfOptionList(option.children);
             return;
           }
         }

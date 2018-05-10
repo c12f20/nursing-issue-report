@@ -22,6 +22,9 @@ nirApp.config(['$stateProvider', '$urlRouterProvider',
       })
       .state('root.config', {
         url: 'config',
+        params: {
+          open_state: [false, false],
+        },
         templateUrl: 'components/config/config.component.html',
         controller: 'ConfigController'
       })

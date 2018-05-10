@@ -77,7 +77,7 @@ nirServices.factory('DbService', function() {
   function __getDatabaseVersion() {
     return new Promise((resolve, reject) => {
       let version = DB_VERSION_INVALID;
-      db = new sqlite3.Database(DB_PATH, sqlite3.OPEN_READWRITE, (err) => {
+      db = new TransactionDatabase(new sqlite3.Database(DB_PATH, sqlite3.OPEN_READWRITE, (err) => {
         if (err) {
           db = null;
           reject(err);
@@ -93,7 +93,7 @@ nirServices.factory('DbService', function() {
           version = parseInt(row.value);
           resolve(version);
         })
-      });
+      }));
     });
   }
 

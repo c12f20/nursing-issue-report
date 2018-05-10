@@ -9,6 +9,10 @@
   },
   "author": "hill.cen",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/c12f20/nursing-issue-report.git"
+  },
   "devDependencies": {
     "electron": "^1.8.4"
   },

@@ -13,7 +13,7 @@ nirServices.factory('DepartmentService', ['$q', 'DbService',
       return deferred.promise;
     }
 
-    function __addDepartment(department_name) {
+    function addDepartment(department_name) {
       let deferred = $q.defer();
       if (!department_name) {
         deferred.reject(new Error("Failed to add department with invalid parameters"));
@@ -35,7 +35,7 @@ nirServices.factory('DepartmentService', ['$q', 'DbService',
       return deferred.promise;
     }
 
-    function __removeDepartment(department_id) {
+    function removeDepartment(department_id) {
       let deferred = $q.defer();
       if (!department_id) {
         deferred.reject(new Error("Failed to remove department with invalid department id"));
@@ -57,7 +57,7 @@ nirServices.factory('DepartmentService', ['$q', 'DbService',
       return deferred.promise;
     }
 
-    function __removeDepartments(departments_id_array) {
+    function removeDepartments(departments_id_array) {
       let deferred = $q.defer();
       if (!departments_id_array) {
         deferred.reject(new Error("Failed to remove departments with invalid departments id array"));
@@ -80,7 +80,7 @@ nirServices.factory('DepartmentService', ['$q', 'DbService',
       return deferred.promise;
     }
 
-    function __updateDepartment(department_object) {
+    function updateDepartment(department_object) {
       let deferred = $q.defer();
       if (!department_object || !(department_object instanceof Department)
       || !department_object.id || !department_object.name) {
@@ -105,7 +105,7 @@ nirServices.factory('DepartmentService', ['$q', 'DbService',
       return deferred.promise;
     }
 
-    function __queryAllDepartmentsCount() {
+    function queryAllDepartmentsCount() {
       let deferred = $q.defer();
       __init().then((db) => {
         let sql = "SELECT count(id) total_count FROM tblDepartment";
@@ -122,7 +122,7 @@ nirServices.factory('DepartmentService', ['$q', 'DbService',
       return deferred.promise;
     }
 
-    function __queryAllDepartments(offset, count) {
+    function queryAllDepartments(offset, count) {
       let deferred = $q.defer();
 
       __init().then((db) => {
@@ -149,11 +149,11 @@ nirServices.factory('DepartmentService', ['$q', 'DbService',
     }
 
     return {
-      addDepartment: __addDepartment,
-      removeDepartment: __removeDepartment,
-      removeDepartments: __removeDepartments,
-      updateDepartment: __updateDepartment,
-      queryDepartmentsCount: __queryAllDepartmentsCount,
-      queryDepartments: __queryAllDepartments
+      addDepartment: addDepartment,
+      removeDepartment: removeDepartment,
+      removeDepartments: removeDepartments,
+      updateDepartment: updateDepartment,
+      queryDepartmentsCount: queryAllDepartmentsCount,
+      queryDepartments: queryAllDepartments
     };
   }]);

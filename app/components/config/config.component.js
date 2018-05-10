@@ -1,10 +1,10 @@
 'use strict';
 
-nirControllers.controller('ConfigController', ['$scope', '$filter', '$state', 'ngDialog', 'DepartmentService', 'IssueService',
-  function($scope, $filter, $state, ngDialog, departmentService, issueService) {
+nirControllers.controller('ConfigController', ['$scope', '$filter', '$state', '$stateParams', 'ngDialog', 'DepartmentService', 'IssueService',
+  function($scope, $filter, $state, $stateParams, ngDialog, departmentService, issueService) {
     // Department Panel
     $scope.department_panel = {
-      open: false,
+      open: $stateParams.open_state[0],
     };
     // About checkbox on the department list
     $scope.onCheckAllDepartments = function() {
@@ -192,7 +192,7 @@ nirControllers.controller('ConfigController', ['$scope', '$filter', '$state', 'n
 
     // Issue Panel
     $scope.issue_panel = {
-      open: false,
+      open: $stateParams.open_state[1],
     };
     // About checkbox on the department list
     $scope.onCheckAllIssues = function() {
@@ -222,10 +222,7 @@ nirControllers.controller('ConfigController', ['$scope', '$filter', '$state', 'n
       $scope.dialog_info.remove_data_note = $filter('translate')('MSG_REMOVE_ISSUE_CONFIRM');
       $scope.dialog_info.to_remove_list = remove_issues_array;
       $scope.onRemoveDialogConfirm = onRemoveIssueDialogConfirm;
-      dialog_id = ngDialog.open({
-        template: "components/config/remove-dlg-template.html",
-        scope: $scope,
-      });
+      $scope.showDialog($scope, "components/config/remove-dlg-template.html");
     }
 
     function onRemoveIssueDialogConfirm(isYes) {
@@ -280,9 +277,9 @@ nirControllers.controller('ConfigController', ['$scope', '$filter', '$state', 'n
 
     function showEditIssuePage(issue_object) {
       if (issue_object && issue_object.id) {
-        $state.go('root.issue_detail', {issue_object: issue_object});
+        $state.go('^.issue_detail', {issue_object: issue_object});
       } else {
-        $state.go('root.issue_detail');
+        $state.go('^.issue_detail');
       }
     }
 
