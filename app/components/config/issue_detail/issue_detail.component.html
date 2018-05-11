@@ -1,7 +1,7 @@
 <div class="config">
   <h1 class="page-header">{{page_info.title}}</h1>
   <p class="btn-double-group">
-    <button class="btn btn-primary" ng-click="onSaveIssue()" ng-disabled="!isIssueChanged()">{{'CAPTION_SAVE' | translate}}</button>
+    <button class="btn btn-primary" ng-click="onSaveIssue()" ng-disabled="!isIssueChanged() || !isIssueValid()">{{'CAPTION_SAVE' | translate}}</button>
     <button class="btn btn-danger" ng-click="onCancel()" >{{'CAPTION_CANCEL' | translate}}</button>
   </p>
   <div class="panel panel-default">

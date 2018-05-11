@@ -35,5 +35,13 @@ nirApp.config(['$stateProvider', '$urlRouterProvider',
         },
         templateUrl: 'components/config/issue_detail/issue_detail.component.html',
         controller: 'IssueDetailController'
+      })
+      .state('root.option_detail', {
+        url: 'option_detail',
+        params: {
+          option_object: undefined,
+        }
+        templateUrl: 'components/config/option_detail/option_detail.component.html',
+        controller: 'OptionDetailController'
       });
   }]);

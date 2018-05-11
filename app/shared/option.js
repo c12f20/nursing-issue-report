@@ -5,6 +5,7 @@ class Option {
     this.__id = id;
     this.__name = name;
     this.__index = 0;
+    this.__db_index = 0;
     this.__value_names = value_names; // Can't be undefined
     if (!this.__value_names) {
       throw new Error("value_names of Option can't be undefined");
@@ -31,6 +32,14 @@ class Option {
 
   get index() {
     return this.__index;
+  }
+
+  set db_index(index) {
+    this.__db_index = index;
+  }
+
+  get db_index() {
+    return this.__db_index;
   }
 
   set parent_name(name) {

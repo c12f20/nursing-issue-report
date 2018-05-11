@@ -2,6 +2,7 @@
 
 nirServices.factory('OptionService', ['$q', 'DbService',
   function($q, dbService) {
+    // Database part
     function __init() {
       let deferred = $q.defer();
       dbService.create().then((db_handle) => {
@@ -13,15 +14,16 @@ nirServices.factory('OptionService', ['$q', 'DbService',
       return deferred.promise;
     }
 
-    function addOptionWithTransaction(transaction, issue_id, option_name, values_name_list) {
+    function addOptionWithTransaction(transaction, issue_id, option_object) {
       let deferred = $q.defer();
-      if (!transaction || !issue_id || !option_name || option_name.length == 0) {
+      if (!transaction || !issue_id || !option_object || !option_object.name || option_object.name.length == 0
+        || !option_object.db_index) {
         deferred.reject(new Error("Failed to add option with invalid parameters"));
         return deferred.promise;
       }
-      let option_values = values_name_list ? values_name_list : [];
-      let sql = "INSERT INTO tblOption (issue_id, name, option_values) VALUES (?, ?, ?)";
-      transaction.run(sql, [issue_id, option_name, JSON.stringify(option_values)],
+      let option_values = option_object.value_names ? option_object.value_names : [];
+      let sql = "INSERT INTO tblOption (issue_id, name, option_index, option_values) VALUES (?, ?, ?, ?)";
+      transaction.run(sql, [issue_id, option_object.name, option_object.db_index, JSON.stringify(option_values)],
         (err) => {
           if (err) {
             deferred.reject(new Error(`Failed to add option, error: ${err.message}`));
@@ -77,13 +79,14 @@ nirServices.factory('OptionService', ['$q', 'DbService',
     function updateOptionWithTransaction(transaction, option_object) {
       let deferred = $q.defer();
       if (!option_object || !(option_object instanceof Option)
-      || !option_object.id || !option_object.name) {
+      || !option_object.id || !option_object.name || !option_object.db_index) {
         deferred.reject(new Error("Failed to update option with invalid option object"));
         return deferred.promise;
       }
       let option_values_data = JSON.stringify(option_object.value_names ? option_object.value_names : []);
       let sql = `UPDATE tblOption SET
         name = '${option_object.name}',
+        option_index = '${option_object.db_index}',
         option_values = '${option_values_data}'
         WHERE id = ${option_object.id}`;
       transaction.run(sql, [],
@@ -115,6 +118,7 @@ nirServices.factory('OptionService', ['$q', 'DbService',
           rows.forEach((row) => {
             let option_values = JSON.parse(row.option_values);
             let option = new Option(row.id, row.name, option_values);
+            option.db_index = row.option_index;
             if (Math.floor(row.option_index) == row.option_index) { // it's integer, so it's a 1st level option
               option.index = Math.floor(row.option_index);
               options.push(option);
@@ -136,12 +140,50 @@ nirServices.factory('OptionService', ['$q', 'DbService',
       });
       return deferred.promise;
     }
+    // List part
+    function getRootOptionByName(options_list, name) {
+      if (!options_list) {
+        return undefined;
+      }
+      for (let i=0; i < options_list.length; i++) {
+        let option = options_list[i];
+        if (option.name == name) {
+          return option;
+        }
+      }
+      return undefined;
+    }
+
+    function convertOptionTreeToList(options_tree) {
+      if (!options_tree) {
+        return;
+      }
+
+      let option_list = [];
+      for (let i=0; i < options_tree.length; i++) {
+        let option = options_tree[i];
+        option.db_index = option.index;
+        option_list.push(option);
+        if (option.children) { // process children options
+          for (let j=0; j < option.children.length; j++) {
+            let child_option = option.children[j];
+            child_option.db_index = option.index + child_option.index/100;
+            option_list.push(child_option);
+          }
+        }
+      }
+      return option_list;
+    }
 
     return {
+      // Database part
       addOptionWithTransaction: addOptionWithTransaction,
       removeOption: removeOption,
       removeOptionsWithTransaction: removeOptionsWithTransaction,
       updateOptionWithTransaction: updateOptionWithTransaction,
       queryIssueOptions: queryOptionsByIssueId,
+      // List part
+      getRootOptionByName:getRootOptionByName,
+      convertOptionTreeToList: convertOptionTreeToList,
     }
   }]);

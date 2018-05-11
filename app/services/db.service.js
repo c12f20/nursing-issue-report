@@ -29,8 +29,7 @@ nirServices.factory('DbService', function() {
           .run(`CREATE TABLE tblOption (
             id integer PRIMARY KEY,
             issue_id integer NOT NULL,
-            parent_option_id integer NOT NULL,
-            index integer NOT NULL,
+            option_index real NOT NULL,
             name text NOT NULL,
             option_values text NOT NULL,
             FOREIGN KEY(issue_id) REFERENCES tblIssue (id)

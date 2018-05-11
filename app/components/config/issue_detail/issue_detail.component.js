@@ -1,7 +1,7 @@
 'use strict';
 
-nirControllers.controller('IssueDetailController', ['$scope', '$state', '$stateParams', '$filter', 'ngDialog', 'IssueService',
-  function($scope, $state, $stateParams, $filter, ngDialog, issueService) {
+nirControllers.controller('IssueDetailController', ['$scope', '$state', '$stateParams', '$filter', 'ngDialog', 'IssueService', 'OptionService',
+  function($scope, $state, $stateParams, $filter, ngDialog, issueService, optionService) {
     // Options related dialogs
     $scope.dialog_info = {};
     function showDeleteOptionConfirmDialog(remove_options_array) {
@@ -93,7 +93,7 @@ nirControllers.controller('IssueDetailController', ['$scope', '$state', '$stateP
         return false;
       }
       if (cur_selected_option.parent_name) { // It's child option
-        let parent_option = find_parent_option_by_name(cur_selected_option.parent_name);
+        let parent_option = optionService.getRootOptionByName($scope.options_list, cur_selected_option.parent_name);
         return cur_selected_option.index < parent_option.children.length;
       } else { // It's a root option
         return cur_selected_option.index < $scope.options_list.length;
@@ -133,7 +133,7 @@ nirControllers.controller('IssueDetailController', ['$scope', '$state', '$stateP
         return;
       }
       if (cur_selected_option.parent_name) { // It's a child option
-        let parent_option = find_parent_option_by_name(cur_selected_option.parent_name);
+        let parent_option = optionService.getRootOptionByName($scope.options_list, cur_selected_option.parent_name);
         moveUpOptionInList(cur_selected_option, parent_option.children);
       } else { // It's a root option
         moveUpOptionInList(cur_selected_option, $scope.options_list);
@@ -145,7 +145,7 @@ nirControllers.controller('IssueDetailController', ['$scope', '$state', '$stateP
         return;
       }
       if (cur_selected_option.parent_name) { // It's a child option
-        let parent_option = find_parent_option_by_name(cur_selected_option.parent_name);
+        let parent_option = optionService.getRootOptionByName($scope.options_list, cur_selected_option.parent_name);
         moveDownOptionInList(cur_selected_option, parent_option.children);
       } else { // It's a root option
         moveDownOptionInList(cur_selected_option, $scope.options_list);
@@ -200,18 +200,6 @@ nirControllers.controller('IssueDetailController', ['$scope', '$state', '$stateP
       title: undefined,
     }
     $scope.options_list = undefined;
-    function find_parent_option_by_name(name) {
-      if (!$scope.options_list) {
-        return undefined;
-      }
-      for (let i=0; i < $scope.options_list.length; i++) {
-        let option = $scope.options_list[i];
-        if (option.name == name) {
-          return option;
-        }
-      }
-      return undefined;
-    }
 
     $scope.issue_object = new Issue(undefined, "");
     function query_issue_details(issue) {

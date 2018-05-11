@@ -13,15 +13,16 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
       return deferred.promise;
     }
     // Add Issue
-    function __addIssueOptions(transaction, issue_id, options_list) {
+    function __addIssueOptions(transaction, issue_id, options_tree) {
       let deferred = $q.defer();
-      if (!options_list || options_list.length == 0) {
+      if (!options_tree || options_tree.length == 0) {
         deferred.resolve();
         return deferred.promise;
       }
+      let options_list = optionService.convertOptionTreeToList(options_tree);
       for (let i=0; i < options_list.length; i++) {
-        option = options_list[i];
-        optionService.addOptionWithTransaction(transaction, issue_id, option.name, option.value_names)
+        let option = options_list[i];
+        optionService.addOptionWithTransaction(transaction, issue_id, option)
           .then(() => {
             if (i == options_list.length-1) { // last element
               deferred.resolve();
@@ -118,19 +119,20 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
       return deferred.promise;
     }
     // Update Issue
-    function __updateIssueOptions(transaction, issue_id, options_list) {
+    function __updateIssueOptions(transaction, issue_id, options_tree) {
       let deferred = $q.defer();
-      if (!options_list || options_list.length == 0) {
+      if (!options_tree || options_tree.length == 0) {
         deferred.resolve();
         return deferred.promise;
       }
+      let options_list = optionService.convertOptionTreeToList(options_tree);
       for (let i=0; i < options_list.length; i++) {
-        option = options_list[i];
+        let option = options_list[i];
         let result;
         if (option.id) {
           result = optionService.updateOptionWithTransaction(transaction, option);
         } else {
-          result = optionService.addOptionWithTransaction(transaction, issue_id, option.name, option.value_names);
+          result = optionService.addOptionWithTransaction(transaction, issue_id, option);
         }
         result.then(() => {
             if (i == options_list.length-1) { // last element
