@@ -1,0 +1,25 @@
+<div class="config">
+  <h1 class="page-header">{{page_info.title}}</h1>
+  <div class="row">
+    <div class="form-group col-xs-6">
+      <label for="optionParentNameButton">{{'CAPTION_OPTION_PARENT' | translate}}</label>
+      <div class="btn-group" uib-dropdown>
+        <button id="optionParentNameButton" type="button" class="btn btn-primary" uib-dropdown-toggle ng-disabled="!canHaveParent()">
+          {{selected_parent_object.name}} <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="optionParentNameButton">
+          <li role="menuitem"><a href="#">Action</a></li>
+          <li role="menuitem"><a href="#">Another action</a></li>
+          <li role="menuitem"><a href="#">Something else here</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="form-group col-xs-6">
+      <label for="optionNameInput">{{'CAPTION_OPTION_NAME' | translate}}</label>
+      <input text class="form-control" id="optionNameInput"
+        placeholder="{{'HINT_INPUT_OPTION_NAME' | translate}}" ng-model="option_object.name" />
+    </div>
+  </div>
+</div>

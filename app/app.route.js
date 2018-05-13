@@ -39,8 +39,9 @@ nirApp.config(['$stateProvider', '$urlRouterProvider',
       .state('root.option_detail', {
         url: 'option_detail',
         params: {
+          issue_object: undefined,
           option_object: undefined,
-        }
+        },
         templateUrl: 'components/config/option_detail/option_detail.component.html',
         controller: 'OptionDetailController'
       });

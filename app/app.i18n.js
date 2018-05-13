@@ -5,6 +5,7 @@ nirApp.config(['$translateProvider',
     let chinese = {
       CAPTION_YES: "是",
       CAPTION_NO: "否",
+      CAPTION_NONE: "无",
       CAPTION_INDEX: "序号",
       CAPTION_ADD: "添加",
       CAPTION_UPDATE: "更新",
@@ -42,9 +43,13 @@ nirApp.config(['$translateProvider',
       HINT_INPUT_ISSUE_NAME: "请输入事件名称",
       CAPTION_OPTIONS_LIST: "统计项目列表",
       CAPTION_ADD_OPTION: "添加统计项目",
+      CAPTION_EDIT_OPTION: "编辑统计项目",
       CAPTION_OPTION_NAME: "统计项名称",
       CAPTION_DELETE_OPTION: "删除统计项目",
       MSG_REMOVE_OPTIONS_CONFIRM: "请确认是否删除如下统计项目：",
+      // Option Detail UI
+      HINT_INPUT_OPTION_NAME: "请输入统计项目名称",
+      CAPTION_OPTION_PARENT: "统计项从属于："
 
     };
 

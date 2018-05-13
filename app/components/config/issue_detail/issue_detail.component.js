@@ -191,8 +191,21 @@ nirControllers.controller('IssueDetailController', ['$scope', '$state', '$stateP
       showDeleteOptionConfirmDialog(remove_options_array);
     }
     // Edit related methods
+    function showEditOptionPage(option) {
+      if (option) {
+        $state.go('^.option_detail', {issue_object: $scope.issue_object, option_object: option});
+      } else {
+        $state.go('^.option_detail', {issue_object: $scope.issue_object});
+      }
+    }
+
+    $scope.onAddOption = function() {
+      showEditOptionPage();
+    }
+
     $scope.onEditOption = function(option) {
       console.log(`onEditOption, option: ${option.name}`);
+      showEditOptionPage(option);
     }
 
     // Load data methods

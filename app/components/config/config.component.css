@@ -41,6 +41,10 @@
   float:right !important;
 }
 
+.config .form-group label {
+  font-size: 20px;
+}
+
 .dialog-content h2 {
   margin-top: 10px;
   margin-bottom: 20px;
