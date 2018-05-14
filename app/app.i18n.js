@@ -44,13 +44,15 @@ nirApp.config(['$translateProvider',
       CAPTION_OPTIONS_LIST: "统计项目列表",
       CAPTION_ADD_OPTION: "添加统计项目",
       CAPTION_EDIT_OPTION: "编辑统计项目",
-      CAPTION_OPTION_NAME: "统计项名称",
+      CAPTION_OPTION_NAME: "统计项目名称",
       CAPTION_DELETE_OPTION: "删除统计项目",
       MSG_REMOVE_OPTIONS_CONFIRM: "请确认是否删除如下统计项目：",
       // Option Detail UI
       HINT_INPUT_OPTION_NAME: "请输入统计项目名称",
-      CAPTION_OPTION_PARENT: "统计项从属于："
-
+      CAPTION_OPTION_PARENT: "该统计项目从属于：",
+      CAPTION_OPTION_VALUE_NAME: "统计项目可选值",
+      HINT_INPUT_OPTION_VALUE_NAME: "请输入统计项目可选值名称",
+      CAPTION_ADD_OPTION_VALUE: "添加统计项目可选值",
     };
 
     $translateProvider
