@@ -234,6 +234,9 @@ nirControllers.controller('IssueDetailController', ['$scope', '$state', '$stateP
           $scope.page_info.title = $filter('translate')('CAPTION_EDIT_ISSUE');
           if (!$stateParams.issue_object.options) {
             query_issue_details($stateParams.issue_object);
+          } else {
+            $scope.issue_object = $stateParams.issue_object;
+            $scope.options_list = $scope.issue_object.options;
           }
         } else {
           $scope.issue_object = $stateParams.issue_object;

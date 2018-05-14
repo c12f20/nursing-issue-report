@@ -47,10 +47,10 @@ nirControllers.controller('OptionDetailController', ['$scope', '$state', '$state
         editing_issue.options = [];
       }
       if ($scope.selected_parent_object.equals(OPTION_NONE)) {
-        $scope.option_object.index = editing_issue.options.length()+1;
+        $scope.option_object.index = editing_issue.options.length+1;
         editing_issue.options.push($scope.option_object);
       } else {
-        $scope.option_object.index = $scope.selected_parent_object.children.length()+1;
+        $scope.option_object.index = $scope.selected_parent_object.children.length+1;
         $scope.selected_parent_object.children.push($scope.option_object);
       }
     }
@@ -64,19 +64,19 @@ nirControllers.controller('OptionDetailController', ['$scope', '$state', '$state
         if ($scope.selected_parent_object.equals(OPTION_NONE)) { // New parent is null
           orignal_parent_object.children.splice(orignal_parent_object.children.indexOf(editing_option), 1);
           optionService.updateListIndex(orignal_parent_object.children);
-          editing_issue.index = editing_issue.options.length()+1;
+          editing_issue.index = editing_issue.options.length+1;
           editing_issue.options.push(editing_issue);
         } else if ($scope.selected_parent_object.name != editing_option.parent_name) { // New parent is not same as the original one
           orignal_parent_object.children.splice(orignal_parent_object.children.indexOf(editing_option), 1);
           optionService.updateListIndex(orignal_parent_object.children);
-          editing_issue.index = $scope.selected_parent_object.children.length()+1;
+          editing_issue.index = $scope.selected_parent_object.children.length+1;
           $scope.selected_parent_object.children.push(editing_issue);
         }
       } else { // original option is a root option
         if (!$scope.selected_parent_object.equals(OPTION_NONE)) { // New parent isn't null
           editing_issue.options.splice(editing_issue.options.indexOf(editing_option), 1);
           optionService.updateListIndex(editing_issue.options);
-          editing_issue.index = $scope.selected_parent_object.children.length()+1;
+          editing_issue.index = $scope.selected_parent_object.children.length+1;
           $scope.selected_parent_object.children.push(editing_issue);
         }
       }
@@ -101,6 +101,7 @@ nirControllers.controller('OptionDetailController', ['$scope', '$state', '$state
       caption_btn_confirm: $filter('translate')('CAPTION_ADD')
     }
     $scope.root_options_list = [OPTION_NONE];
+    $scope.option_object = new Option(undefined, "", []);
 
     let editing_issue = undefined;
     let editing_option = undefined;
@@ -136,8 +137,6 @@ nirControllers.controller('OptionDetailController', ['$scope', '$state', '$state
         for (let i=0; i < $scope.option_object.value_names.length; i++) {
           $scope.values_list.push({"name": $scope.option_object.value_names[i]});
         }
-      } else {
-        $scope.option_object = new Option(undefined, "", []);
       }
     }
 
