@@ -11,6 +11,11 @@ nirControllers.controller('OptionDetailController', ['$scope', '$state', '$state
     $scope.selected_parent_object = OPTION_NONE;
     $scope.onSelectParentOption = function(option) {
       $scope.selected_parent_object = option;
+      if ($scope.selected_parent_object.equals(OPTION_NONE)) {
+        $scope.option_object.parent_name = undefined;
+      } else {
+        $scope.option_object.parent_name = $scope.selected_parent_object.name;
+      }
     }
 
     // Option Values list
@@ -51,6 +56,7 @@ nirControllers.controller('OptionDetailController', ['$scope', '$state', '$state
         editing_issue.options.push($scope.option_object);
       } else {
         $scope.option_object.index = $scope.selected_parent_object.children.length+1;
+        $scope.option_object.parent_name = $scope.selected_parent_object.name;
         $scope.selected_parent_object.children.push($scope.option_object);
       }
     }
@@ -64,20 +70,23 @@ nirControllers.controller('OptionDetailController', ['$scope', '$state', '$state
         if ($scope.selected_parent_object.equals(OPTION_NONE)) { // New parent is null
           orignal_parent_object.children.splice(orignal_parent_object.children.indexOf(editing_option), 1);
           optionService.updateListIndex(orignal_parent_object.children);
-          editing_issue.index = editing_issue.options.length+1;
-          editing_issue.options.push(editing_issue);
+          editing_option.index = editing_issue.options.length+1;
+          editing_option.parent_name = undefined;
+          editing_issue.options.push(editing_option);
         } else if ($scope.selected_parent_object.name != editing_option.parent_name) { // New parent is not same as the original one
           orignal_parent_object.children.splice(orignal_parent_object.children.indexOf(editing_option), 1);
           optionService.updateListIndex(orignal_parent_object.children);
-          editing_issue.index = $scope.selected_parent_object.children.length+1;
-          $scope.selected_parent_object.children.push(editing_issue);
+          editing_option.index = $scope.selected_parent_object.children.length+1;
+          editing_option.parent_name = $scope.selected_parent_object.name;
+          $scope.selected_parent_object.children.push(editing_option);
         }
       } else { // original option is a root option
         if (!$scope.selected_parent_object.equals(OPTION_NONE)) { // New parent isn't null
           editing_issue.options.splice(editing_issue.options.indexOf(editing_option), 1);
           optionService.updateListIndex(editing_issue.options);
-          editing_issue.index = $scope.selected_parent_object.children.length+1;
-          $scope.selected_parent_object.children.push(editing_issue);
+          editing_option.index = $scope.selected_parent_object.children.length+1;
+          editing_option.parent_name = $scope.selected_parent_object.name;
+          $scope.selected_parent_object.children.push(editing_option);
         }
       }
     }

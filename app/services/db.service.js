@@ -114,6 +114,22 @@ nirServices.factory('DbService', function() {
     });
   }
 
+  function __initDatabase() {
+    return new Promise((resolve, reject) => {
+      if (!db) {
+        reject(new Error("Can't initialize Database with invalid DB Handle"));
+        return;
+      }
+      db.run(`PRAGMA foreign_keys = ON;`, (err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(db);
+      })
+    })
+  }
+
   function init() {
     return new Promise((resolve, reject) => {
       if (db) {
@@ -123,11 +139,11 @@ nirServices.factory('DbService', function() {
       __getDatabaseVersion().then((db_version) => {
         console.log(`Current Database version ${db_version}`);
         __alertDatabase(db_version);
-        resolve(db);
+        resolve(__initDatabase());
       }, (err) => {
         console.warn(err.message);
         __alertDatabase(DB_VERSION_INVALID);
-        resolve(db);
+        resolve(__initDatabase());
       });
     })
   }

@@ -90,7 +90,7 @@ class Option {
     if (!other || !(other instanceof Option)) {
       return false;
     }
-    if (!(this.__id == other.id && this.__index == other.__index && this.__name == other.name
+    if (!(this.__id == other.id && this.__index == other.__index && this.__name == other.name && this.__parent_name == other.parent_name
     && JSON.stringify(this.__value_names) == JSON.stringify(other.value_names))) {
       return false;
     };

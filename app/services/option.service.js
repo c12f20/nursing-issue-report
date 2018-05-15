@@ -175,6 +175,16 @@ nirServices.factory('OptionService', ['$q', 'DbService',
       return option_list;
     }
 
+    function updateListIndex(options_list) {
+      if (!options_list) {
+        return;
+      }
+      for (let i=0; i < options_list.length; i++) {
+        let option = options_list[i];
+        option.index = i+1;
+      }
+    }
+
     return {
       // Database part
       addOptionWithTransaction: addOptionWithTransaction,
@@ -185,5 +195,6 @@ nirServices.factory('OptionService', ['$q', 'DbService',
       // List part
       getRootOptionByName:getRootOptionByName,
       convertOptionTreeToList: convertOptionTreeToList,
+      updateListIndex: updateListIndex,
     }
   }]);
