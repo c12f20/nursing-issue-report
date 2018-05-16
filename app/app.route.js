@@ -20,6 +20,11 @@ nirApp.config(['$stateProvider', '$urlRouterProvider',
         templateUrl: 'components/demo/demo.component.html',
         controller: 'treeGridController'
       })
+      .state('root.report', {
+        url: 'report',
+        templateUrl: 'components/report/report.component.html',
+        controller: 'ReportController'
+      })
       .state('root.config', {
         url: 'config',
         params: {

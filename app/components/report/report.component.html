@@ -1,0 +1,22 @@
+<div class="report">
+  <h1 class="page-header">{{'TITLE_REPORT_LIST' | translate}}</h1>
+  <h4>{{'CAPTION_SELECT_DATE_RANGE' | translate}}</h4>
+  <div class="row">
+    <div class="col-xs-6">
+      <p class="input-group">
+        <input type="text" class="form-control" uib-datepicker-popup ng-model="date_range.start" is-open="start_date_popup.opened" datepicker-options="dateOptions" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" />
+        <span class="input-group-btn">
+          <button type="button" class="btn btn-default" ng-click="open1()"><i class="glyphicon glyphicon-calendar"></i></button>
+        </span>
+      </p>
+    </div>
+    <div class="col-xs-6">
+      <p class="input-group">
+        <input type="text" class="form-control" uib-datepicker-popup ng-model="date_range.end" is-open="end_date_popup.opened" datepicker-options="dateOptions" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" />
+        <span class="input-group-btn">
+          <button type="button" class="btn btn-default" ng-click="open1()"><i class="glyphicon glyphicon-calendar"></i></button>
+        </span>
+      </p>
+    </div>
+  </div>
+</div>

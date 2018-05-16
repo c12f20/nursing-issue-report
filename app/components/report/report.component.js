@@ -1,6 +1,6 @@
 'use strict';
 
-nirControllers.controller('IssuesController', ['$scope',
+nirControllers.controller('ReportController', ['$scope',
   function($scope) {
     $scope.title = "Issues List";
   }]);

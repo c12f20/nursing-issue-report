@@ -21,6 +21,10 @@ nirApp.config(['$translateProvider',
       CAPTION_PREV_PAGE: "上一页",
       CAPTION_MOVE_UP: "上移",
       CAPTION_MOVE_DOWN: "下移",
+      // Home UI
+      TITLE_HOME: "开始",
+      // Report List UI
+      TITLE_REPORT_LIST: "事件报告列表",
       // Config UI
       TITLE_CONFIG: "配置",
       CAPTION_DEPARTMENT_LIST: "部门列表",
@@ -38,7 +42,7 @@ nirApp.config(['$translateProvider',
       CAPTION_EDIT_ISSUE: "编辑事件",
       CAPTION_DELETE_ISSUE: "删除事件",
       HINT_INPUT_ISSUE_NAME: "请输入事件名称",
-      MSG_REMOVE_ISSUE_CONFIRM: "请确认是否删除如下事件：",
+      MSG_REMOVE_ISSUE_CONFIRM: "删除事件会同时删除相关事件的报告，请确认是否删除如下事件：",
       // Issue Detail UI
       HINT_INPUT_ISSUE_NAME: "请输入事件名称",
       CAPTION_OPTIONS_LIST: "统计项目列表",
@@ -46,7 +50,7 @@ nirApp.config(['$translateProvider',
       CAPTION_EDIT_OPTION: "编辑统计项目",
       CAPTION_OPTION_NAME: "统计项目名称",
       CAPTION_DELETE_OPTION: "删除统计项目",
-      MSG_REMOVE_OPTIONS_CONFIRM: "请确认是否删除如下统计项目：",
+      MSG_REMOVE_OPTIONS_CONFIRM: "删除统计项目会同时删除相关内容的统计报告，请确认是否删除如下统计项目：",
       // Option Detail UI
       HINT_INPUT_OPTION_NAME: "请输入统计项目名称",
       CAPTION_OPTION_PARENT: "该统计项目从属于：",

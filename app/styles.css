@@ -3,4 +3,5 @@
 @import "../node_modules/ng-dialog/css/ngDialog-theme-default.css";
 @import "../node_modules/angular-bootstrap-grid-tree/src/treeGrid.css";
 @import "components/root.component.css";
+@import "components/report/report.component.css";
 @import "components/config/config.component.css";

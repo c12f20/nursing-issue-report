@@ -14,3 +14,7 @@ body {
 .root-container .root-nav {
   padding: 0;
 }
+
+.root-container .page-header {
+  margin-top: 5px;
+}
