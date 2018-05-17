@@ -5,6 +5,10 @@ body {
   height: 768px;
 }
 
+.ng-invalid {
+    border: 1px solid red !important;
+}
+
 .root-container {
   width: 100%;
   height: 100%;

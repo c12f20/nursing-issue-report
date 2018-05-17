@@ -5,7 +5,7 @@ class Report {
     this.__id = report_id;
     this.__department_object = department_object;
     this.__issue_object = issue_object;
-    this.__creation_time = 0;
+    this.__creation_time = new Date();
   }
 
   get id() {
@@ -33,10 +33,14 @@ class Report {
   }
 
   get creation_time() {
-    if (this.__creation_time) {
-      return new Date(this.__creation_time).toLocaleString();
-    } else {
-      return undefined;
-    }
+    return this.__creation_time;
+  }
+
+  set creation_timestamp(timestamp) {
+    this.__creation_time = new Date(timestamp*1000);
+  }
+
+  get creation_timestamp() {
+    return this.__creation_time.getTime()/1000;
   }
 }

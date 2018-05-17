@@ -1,22 +1,61 @@
 <div class="report">
   <h1 class="page-header">{{'TITLE_REPORT_LIST' | translate}}</h1>
-  <h4>{{'CAPTION_SELECT_DATE_RANGE' | translate}}</h4>
+  <h3>{{'CAPTION_SELECT_DATE_RANGE' | translate}}</h3>
+  <!-- Date Range Selector -->
   <div class="row">
     <div class="col-xs-6">
+      <label>{{'CAPTION_START_DATE' | translate}}</label>
       <p class="input-group">
-        <input type="text" class="form-control" uib-datepicker-popup ng-model="date_range.start" is-open="start_date_popup.opened" datepicker-options="dateOptions" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" />
+        <input type="text" class="form-control" uib-datepicker-popup ng-model="date_range.start" is-open="start_date_popup.opened" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
         <span class="input-group-btn">
-          <button type="button" class="btn btn-default" ng-click="open1()"><i class="glyphicon glyphicon-calendar"></i></button>
+          <button type="button" class="btn btn-default" ng-click="openStartDatePopup()"><i class="glyphicon glyphicon-calendar"></i></button>
         </span>
       </p>
     </div>
     <div class="col-xs-6">
+      <label>{{'CAPTION_END_DATE' | translate}}</label>
       <p class="input-group">
-        <input type="text" class="form-control" uib-datepicker-popup ng-model="date_range.end" is-open="end_date_popup.opened" datepicker-options="dateOptions" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" />
+        <input type="text" class="form-control" uib-datepicker-popup ng-model="date_range.end" is-open="end_date_popup.opened" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
         <span class="input-group-btn">
-          <button type="button" class="btn btn-default" ng-click="open1()"><i class="glyphicon glyphicon-calendar"></i></button>
+          <button type="button" class="btn btn-default" ng-click="openEndDatePopup()"><i class="glyphicon glyphicon-calendar"></i></button>
         </span>
       </p>
     </div>
   </div>
+  <!-- Report List -->
+  <!-- No Data View -->
+  <div ng-if="!report_list || report_list.length == 0">
+    <div class="message">
+      {{'MSG_NO_REPORT_DATA_FOUND' | translate}}
+    </div>
+  </div>
+  <!-- Data View -->
+  <div ng-if="report_list && report_list.length > 0">
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th width="5%" class="hcenter">
+            <input type="checkbox" ng-model="reports_info.checkedAll" ng-change="onCheckAllReports()">
+          </th>
+          <th width="10%" class="hcenter">{{'CAPTION_INDEX' | translate}}</th>
+          <th width="20%">{{'CAPTION_DEPARTMENT_NAME' | translate}}</th>
+          <th width="25%">{{'CAPTION_ISSUE_NAME' | translate}}</th>
+          <th width="20%">{{'CAPTION_DATE' | translate}}</th>
+          <th width="20%" class="hcenter">{{'CAPTION_ACTION' | translate}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="report in report_list">
+          <td class="hcenter"><input type="checkbox" ng-model="report.checked"></th>
+          <td class="hcenter">{{(reports_info.cur_page-1) * reports_info.count_per_page + $index + 1}}</td>
+          <td>{{report.department_object.name}}</td>
+          <td>{{report.issue_object.name}}</td>
+          <td>{{report.creation_time.toLocaleString()}}</td>
+          <td class="hcenter">
+            <button class="btn btn-info" ng-click="onViewReportDetail($index)">{{'CAPTION_VIEW' | translate}}</button>
+            <button class="btn btn-danger" ng-click="onDeleteReport($index)">{{'CAPTION_DELETE' | translate}}</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 </div>

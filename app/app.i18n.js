@@ -21,10 +21,15 @@ nirApp.config(['$translateProvider',
       CAPTION_PREV_PAGE: "上一页",
       CAPTION_MOVE_UP: "上移",
       CAPTION_MOVE_DOWN: "下移",
+      CAPTION_DATE: "日期",
       // Home UI
       TITLE_HOME: "开始",
       // Report List UI
       TITLE_REPORT_LIST: "事件报告列表",
+      CAPTION_SELECT_DATE_RANGE: "请选择事件报告的日期范围：",
+      CAPTION_START_DATE: "开始日期",
+      CAPTION_END_DATE: "结束日期",
+      MSG_NO_REPORT_DATA_FOUND: "没有找到符合条件的报告",
       // Config UI
       TITLE_CONFIG: "配置",
       CAPTION_DEPARTMENT_LIST: "部门列表",

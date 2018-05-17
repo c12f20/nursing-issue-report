@@ -1,6 +1,6 @@
 'use strict';
 
-nirServices.factory('ReportService', ['DBService',
+nirServices.factory('ReportService', ['DbService',
   function(dbService) {
     var db = null;
     function init() {
@@ -86,7 +86,7 @@ nirServices.factory('ReportService', ['DBService',
       });
     }
 
-    function queryAllReports(offset, count) {
+    function queryReportsInDateRange(offset, count, start_date, end_date) {
       return new Promise((resolve, reject) => {
         if (!db) {
           reject(new Error("Failed to query all reports as database isn't ready"));
@@ -94,6 +94,19 @@ nirServices.factory('ReportService', ['DBService',
         }
         count = count ? count : -1;
         offset = offset ? offset : 0;
+        let where_clause = "";
+        if (state_date || end_date) {
+          where_clause = "WHERE";
+          if (start_date) {
+            where_clause += " tblReport.creation_time >= " +start_date.getTime()/1000;
+          }
+          if (end_date) {
+            if (start_date) {
+              where_clause += " and";
+            }
+            where_clause += " tblReport.creation_time <= "+end_date.getTime()/1000;
+          }
+        }
         let sql = `SELECT tblReport.id report_id,
            tblReport.department_id department_id,
            tblReport.issue_id issue_id,
@@ -104,6 +117,7 @@ nirServices.factory('ReportService', ['DBService',
          LEFT JOIN tblDepartment ON tblDepartment.id = tblReport.department_id
          LEFT JOIN tblIssue ON tblIssue.id = tblReport.issue_id
          ORDER BY tblReport.creation_time
+         ${where_clause}
          LIMIT ${count} OFFSET ${offset}`
         db.all(sql, [], (err, rows) => {
           if (err) {
@@ -115,6 +129,7 @@ nirServices.factory('ReportService', ['DBService',
             let department = new Department(row.department_id, row.department_name);
             let issue = new Issue(row.issue_id, row.issue_name);
             let report = new Report(row.report_id, department, issue);
+            report.creation_timestamp = creation_timestamp;
             reports.push(report);
           });
           resolve(reports);
@@ -124,8 +139,8 @@ nirServices.factory('ReportService', ['DBService',
 
     return {
       addReport: addReport,
-      deleteReport: deleteReport,
+      removeReport: removeReport,
       updateReport: updateReport,
-      queryReports: queryAllReports
+      queryReports: queryReportsInDateRange
     }
   }]);
