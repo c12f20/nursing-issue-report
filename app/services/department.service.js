@@ -8,7 +8,6 @@ nirServices.factory('DepartmentService', ['$q', 'DbService',
         deferred.resolve(db_handle);
       }, (err) => {
         deferred.reject(new Error(`DepartmentService: failed to get DB Handle, error: ${err.message}`));
-        db = null;
       })
       return deferred.promise;
     }

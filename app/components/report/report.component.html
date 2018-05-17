@@ -48,8 +48,8 @@
         <tr ng-repeat="report in report_list">
           <td class="hcenter"><input type="checkbox" ng-model="report.checked"></th>
           <td class="hcenter">{{(reports_info.cur_page-1) * reports_info.count_per_page + $index + 1}}</td>
-          <td>{{report.department_object.name}}</td>
-          <td>{{report.issue_object.name}}</td>
+          <td>{{report.department.name}}</td>
+          <td>{{report.issue.name}}</td>
           <td>{{report.creation_time.toLocaleString()}}</td>
           <td class="hcenter">
             <button class="btn btn-info" ng-click="onViewReportDetail($index)">{{'CAPTION_VIEW' | translate}}</button>
@@ -58,4 +58,13 @@
         </tr>
       </tbody>
     </table>
+    <ul uib-pagination ng-if="reports_info.total_count > reports_info.count_per_page"
+      total-items="reports_info.total_count"
+      items-per-page="reports_info.count_per_page"
+      ng-model="reports_info.cur_page"
+      ng-change="onReportPageChanged()"
+      max-size="reports_info.max_count_pages"
+      boundary-link-numbers="true"
+      next-text="{{'CAPTION_NEXT_PAGE' | translate}}"
+      previous-text="{{'CAPTION_PREV_PAGE' | translate}}" ></ul>
 </div>

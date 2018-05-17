@@ -1,112 +1,138 @@
 'use strict';
 
-nirServices.factory('ReportService', ['DbService',
-  function(dbService) {
-    var db = null;
-    function init() {
+nirServices.factory('ReportService', ['$q', 'DbService',
+  function($q, dbService) {
+    let db = undefined;
+    function __init() {
+      let deferred = $q.defer();
       dbService.create().then((db_handle) => {
-        db = db_handle;
+        deferred.resolve(db_handle);
       }, (err) => {
-        console.error(`ReportService: failed to get DB Handle, error: ${err.message}`);
-        db = null;
+        deferred.reject(new Error(`ReportService: failed to get DB Handle, error: ${err.message}`));
       })
+      return deferred.promise;
     }
-    init();
 
     // Report related methods
-    function addReport(department_id, issue_object) {
-      return new Promise((resolve, reject) => {
-        if (!department_id || !issue_object
-        || !(issue_object instanceof Issue)) {
-          reject(new Error("Failed to add report with invalid parameters"));
-          return;
-        }
-        if (!db) {
-          reject(new Error("Failed to add report as database isn't ready"));
-          return;
-        }
+    function addReport(department_id, issue_id, creation_time) {
+      let deferred = $q.defer();
+      if (!department_id || !issue_id
+      || !creation_time || !(creation_time instanceof Date)) {
+        deferred.reject(new Error("Failed to add report with invalid parameters"));
+        return;
+      }
+      __init().then((db) => {
+        let creation_timestamp = creation_time.getTime()/1000;
         db.run(`INSERT INTO tblReport (department_id, issue_id, creation_time)
-          VALUES (${department_id}, ${issue_object.issue_id}, ${issue_object.creation_time})`,
+          VALUES (${department_id}, ${issue_id}, ${creation_timestamp})`,
           (err) => {
             if (err) {
-              reject(new Error(`Failed to add report, error: ${err.message}`));
+              deferred.reject(new Error(`Failed to add report, error: ${err.message}`));
               return;
             }
-            resolve();
+            deferred.resolve();
           });
+      }, (err) => {
+        deferred.reject(err);
       });
+      return deferred.promise;
     }
 
     function removeReport(report_id) {
-      return new Promise((resolve, reject) => {
-        if (!report_id) {
-          reject(new Error("Failed to remove report with invalid report id"));
-          return;
-        }
-        if (!db) {
-          reject(new Error("Failed to remove report as database isn't ready"));
-          return;
-        }
-
+      let deferred = $q.defer();
+      if (!report_id) {
+        deferred.reject(new Error("Failed to remove report with invalid report id"));
+        return;
+      }
+      __init().then((db) => {
         db.run(`DELETE FROM tblReport where id = ${report_id}`,
           (err) => {
             if (err) {
-              reject(new Error(`Failed to remove report ${report_id}, error: ${err.message}`));
+              deferred.reject(new Error(`Failed to remove report ${report_id}, error: ${err.message}`));
               return;
             }
-            resolve();
+            deferred.resolve();
           });
+      }, (err) => {
+        deferred.reject(err);
       });
+      return deferred.promise;
     }
 
     function updateReport(report_object) {
-      return new Promise((resolve, reject) => {
-        if (!report_object || !report_object.id || !report_object.department_id
-        || !report_object.issue || !(report_object.issue instanceof Issue)) {
-          reject(new Error("Failed to update report with invalid parameters"));
-          return;
-        }
-        if (!db) {
-          reject(new Error("Failed to update report as database isn't ready"));
-          return;
-        }
+      let deferred = $q.defer();
+      if (!report_object || !report_object.id
+      || !report_object.department_object || !(report_object.department_object instanceof Department)
+      || !report_object.issue || !(report_object.issue instanceof Issue)
+      || !report_object.creation_time || !(report_object.creation_time instanceof Date)) {
+        deferred.reject(new Error("Failed to update report with invalid parameters"));
+        return;
+      }
+      __init().then((db) => {
+        let department_object = report_object.department_object;
         let issue_object = report_object.issue;
+        let creation_timestamp = report_object.creation_time.getTime()/1000;
         db.run(`UPDATE tblReport SET
-          department_id = ${report_object.department_id},
-          issue_id = ${issue_object.issue_id},
-          creation_time = ${report_object.creation_time},
+          department_id = ${department_object.id},
+          issue_id = ${issue_object.id},
+          creation_time = ${creation_timestamp},
           WHERE id = ${report_object.id}`,
           (err) => {
             if (err) {
-              reject(new Error(`Failed to update report ${report_object.id}, error: ${err.message}`));
+              deferred.reject(new Error(`Failed to update report ${report_object.id}, error: ${err.message}`));
               return;
             }
-            resolve();
+            deferred.resolve();
           });
+      }, (err) => {
+        deferred.reject(err);
+      })
+      return deferred.promise;
+    }
+
+    function buildQueryWhereClause(start_date, end_date) {
+      let where_clause = ""
+      if (start_date || end_date) {
+        where_clause = "WHERE";
+        if (start_date) {
+          where_clause += " tblReport.creation_time >= " +start_date.getTime()/1000;
+        }
+        if (end_date) {
+          if (start_date) {
+            where_clause += " and";
+          }
+          where_clause += " tblReport.creation_time <= "+end_date.getTime()/1000;
+        }
+      }
+      return where_clause;
+    }
+
+    function queryReportsCountInDataRange(start_date, end_date) {
+      let deferred = $q.defer();
+      __init().then((db) => {
+        let where_clause = buildQueryWhereClause(start_date, end_date);
+
+        let sql = "SELECT count(id) total_count FROM tblReport";
+        db.get(sql, [], (err, row) => {
+          if (err) {
+            deferred.reject(new Error(`Failed to query count of all reports, error: ${err.message}`));
+            return;
+          }
+          deferred.resolve(row.total_count);
+        })
+      }, (err) => {
+        deferred.reject(err);
       });
+      return deferred.promise;
     }
 
     function queryReportsInDateRange(offset, count, start_date, end_date) {
-      return new Promise((resolve, reject) => {
-        if (!db) {
-          reject(new Error("Failed to query all reports as database isn't ready"));
-          return;
-        }
+      let deferred = $q.defer();
+      __init().then((db) => {
         count = count ? count : -1;
         offset = offset ? offset : 0;
-        let where_clause = "";
-        if (state_date || end_date) {
-          where_clause = "WHERE";
-          if (start_date) {
-            where_clause += " tblReport.creation_time >= " +start_date.getTime()/1000;
-          }
-          if (end_date) {
-            if (start_date) {
-              where_clause += " and";
-            }
-            where_clause += " tblReport.creation_time <= "+end_date.getTime()/1000;
-          }
-        }
+        let where_clause = buildQueryWhereClause(start_date, end_date);
+
         let sql = `SELECT tblReport.id report_id,
            tblReport.department_id department_id,
            tblReport.issue_id issue_id,
@@ -121,7 +147,7 @@ nirServices.factory('ReportService', ['DbService',
          LIMIT ${count} OFFSET ${offset}`
         db.all(sql, [], (err, rows) => {
           if (err) {
-            reject(new Error(`Failed to query all reports, error: ${err.message}`));
+            deferred.reject(new Error(`Failed to query all reports, error: ${err.message}`));
             return;
           }
           let reports = [];
@@ -129,18 +155,24 @@ nirServices.factory('ReportService', ['DbService',
             let department = new Department(row.department_id, row.department_name);
             let issue = new Issue(row.issue_id, row.issue_name);
             let report = new Report(row.report_id, department, issue);
-            report.creation_timestamp = creation_timestamp;
+            report.creation_timestamp = row.creation_timestamp;
             reports.push(report);
           });
-          resolve(reports);
+          deferred.resolve(reports);
         });
+
+      }, (err) => {
+        deferred.reject(err);
       });
+
+      return deferred.promise;
     }
 
     return {
       addReport: addReport,
       removeReport: removeReport,
       updateReport: updateReport,
+      queryReportsCount: queryReportsCountInDataRange,
       queryReports: queryReportsInDateRange
     }
   }]);

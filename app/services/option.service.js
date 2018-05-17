@@ -9,7 +9,6 @@ nirServices.factory('OptionService', ['$q', 'DbService',
         deferred.resolve(db_handle);
       }, (err) => {
         deferred.reject(new Error(`OptionService: failed to get DB Handle, error: ${err.message}`));
-        db = null;
       })
       return deferred.promise;
     }
