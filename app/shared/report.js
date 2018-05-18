@@ -43,4 +43,8 @@ class Report {
   get creation_timestamp() {
     return this.__creation_time.getTime()/1000;
   }
+
+  get creation_time_string() {
+    return this.__creation_time.toLocaleString('zh-CN', {hour12: false});
+  }
 }

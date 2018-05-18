@@ -1,0 +1,13 @@
+<div class="dialog-content">
+  <h2>{{dialog_info.title}}</h2>
+  <div class="content">
+    <p>{{dialog_info.remove_data_note}}</p>
+    <div class="info"><span>{{('CAPTION_DATE' | translate)+': '}}</span>{{dialog_info.to_remove_report.creation_time_string}}</div>
+    <div class="info"><span>{{('CAPTION_DEPARTMENT_NAME' | translate)+': '}}</span>{{dialog_info.to_remove_report.department.name}}</div>
+    <div class="info"><span>{{('CAPTION_ISSUE_NAME' | translate)+': '}}</span>{{dialog_info.to_remove_report.issue.name}}</div>
+  </div>
+  <div class="buttons">
+    <button class="btn btn-primary btn-double" ng-click="onRemoveDialogConfirm(true)" >{{'CAPTION_YES' | translate}}</button>
+    <button class="btn btn-danger btn-double" ng-click="onRemoveDialogConfirm(false)" >{{'CAPTION_NO' | translate}}</button>
+  </div>
+</div>

@@ -40,34 +40,3 @@
 .config .form-group label {
   font-size: 20px;
 }
-
-.dialog-content h2 {
-  margin-top: 10px;
-  margin-bottom: 20px;
-}
-
-.dialog-content .content {
-  font-size: 20px;
-}
-
-.dialog-content .content input[text] {
-  width: 100%;
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-
-.dialog-content .content ul {
-  margin-top: 10px;
-}
-
-.dialog-content .buttons {
-  text-align: center;
-}
-
-.dialog-content .buttons .btn-single {
-  width: 50%;
-}
-
-.dialog-content .buttons .btn-double {
-  width: 40%;
-}

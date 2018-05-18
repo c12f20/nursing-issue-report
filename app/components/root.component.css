@@ -22,3 +22,43 @@ body {
 .root-container .page-header {
   margin-top: 5px;
 }
+
+.dialog-content h2 {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.dialog-content .content {
+  font-size: 20px;
+}
+
+.dialog-content .content input[text] {
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.dialog-content .content ul {
+  margin-top: 10px;
+}
+
+.dialog-content .content .info {
+  margin: 5px 0px 0px 20px;
+}
+
+.dialog-content .content .info span {
+  font-weight: bold;
+}
+
+.dialog-content .buttons {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.dialog-content .buttons .btn-single {
+  width: 50%;
+}
+
+.dialog-content .buttons .btn-double {
+  width: 40%;
+}

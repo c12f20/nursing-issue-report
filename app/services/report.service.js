@@ -90,18 +90,35 @@ nirServices.factory('ReportService', ['$q', 'DbService',
       return deferred.promise;
     }
 
+    function queryReportsMinCreationTime() {
+      let deferred = $q.defer();
+      __init().then((db) => {
+        let sql = "SELECT min(creation_time) min_creation_time FROM tblReport";
+        db.get(sql, [], (err, row) => {
+          if (err) {
+            deferred.reject(new Error(`Failed to query minimum creation time of all reports, error: ${err.message}`));
+            return;
+          }
+          deferred.resolve(row.min_creation_time);
+        })
+      }, (err) => {
+        deferred.reject(err);
+      });
+      return deferred.promise;
+    }
+
     function buildQueryWhereClause(start_date, end_date) {
       let where_clause = ""
       if (start_date || end_date) {
         where_clause = "WHERE";
         if (start_date) {
-          where_clause += " tblReport.creation_time >= " +start_date.getTime()/1000;
+          where_clause += " tblReport.creation_time >= " +Math.round(start_date.getTime()/1000);
         }
         if (end_date) {
           if (start_date) {
             where_clause += " and";
           }
-          where_clause += " tblReport.creation_time <= "+end_date.getTime()/1000;
+          where_clause += " tblReport.creation_time <= "+Math.round(end_date.getTime()/1000);
         }
       }
       return where_clause;
@@ -112,7 +129,7 @@ nirServices.factory('ReportService', ['$q', 'DbService',
       __init().then((db) => {
         let where_clause = buildQueryWhereClause(start_date, end_date);
 
-        let sql = "SELECT count(id) total_count FROM tblReport";
+        let sql = `SELECT count(id) total_count FROM tblReport ${where_clause}`;
         db.get(sql, [], (err, row) => {
           if (err) {
             deferred.reject(new Error(`Failed to query count of all reports, error: ${err.message}`));
@@ -142,12 +159,12 @@ nirServices.factory('ReportService', ['$q', 'DbService',
          FROM tblReport
          LEFT JOIN tblDepartment ON tblDepartment.id = tblReport.department_id
          LEFT JOIN tblIssue ON tblIssue.id = tblReport.issue_id
-         ORDER BY tblReport.creation_time
          ${where_clause}
+         ORDER BY tblReport.creation_time DESC
          LIMIT ${count} OFFSET ${offset}`
         db.all(sql, [], (err, rows) => {
           if (err) {
-            deferred.reject(new Error(`Failed to query all reports, error: ${err.message}`));
+            deferred.reject(new Error(`Failed to query all reports, sql: ${sql}, error: ${err.message}`));
             return;
           }
           let reports = [];
@@ -173,6 +190,7 @@ nirServices.factory('ReportService', ['$q', 'DbService',
       removeReport: removeReport,
       updateReport: updateReport,
       queryReportsCount: queryReportsCountInDataRange,
+      queryReportsMinCreationTime, queryReportsMinCreationTime,
       queryReports: queryReportsInDateRange
     }
   }]);

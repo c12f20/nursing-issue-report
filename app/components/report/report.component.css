@@ -4,3 +4,11 @@
   text-align: center;
   vertical-align: middle;
 }
+
+.report .table .hcenter {
+  text-align: center;
+}
+
+.report .table > tbody > tr > td {
+  vertical-align: middle;
+}
