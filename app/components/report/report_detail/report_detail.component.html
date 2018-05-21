@@ -1,0 +1,31 @@
+<div class="report">
+  <h1 class="page-header">{{page_info.title}}</h1>
+  <div class="row">
+    <div class="col-xs-6">
+      <label>{{'CAPTION_CREATION_DATE' | translate}}</label>
+      <p class="input-group">
+        <input type="text" class="form-control" uib-datepicker-popup ng-model="editing_report.creation_time" ng-change="onCreationDateChanged()" is-open="creation_date_popup.opened"
+          ng-required="true" close-text="{{'CAPTION_CLOSE' | translate}}" current-text="{{'CAPTION_TODAY' | translate}}" clear-text="{{'CAPTION_CLEAR' | translate}}"/>
+        <span class="input-group-btn">
+          <button type="button" class="btn btn-default" ng-click="openCreationDatePopup()"><i class="glyphicon glyphicon-calendar"></i></button>
+        </span>
+      </p>
+    </div>
+    <div class="col-xs-6">
+      <label>{{'CAPTION_CREATION_TIME' | translate}}</label>
+      <div uib-timepicker ng-model="editing_report.creation_time" ng-change="onCreationDateChanged()" show-meridian="false" show-spinners="false" ></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-6">
+      <label>{{'CAPTION_REPORT_DEPARTMENT' | translate}}</label>
+      <select class="form-control" ng-change="onDepartmentChanged()" ng-model="selected_department" ng-options="department.name for department in departments_list"></select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-6">
+      <label>{{'CAPTION_REPORT_ISSUE' | translate}}</label>
+      <select class="form-control" ng-change="onIssueChanged()" ng-model="selected_issue" ng-options="issue.name for issue in issues_list"></select>
+    </div>
+  </div>
+</div>

@@ -80,7 +80,7 @@ nirControllers.controller('ReportController', ['$scope', '$filter', '$state', 'R
 
     // Edit Report UI
     $scope.onEditReportDetail = function(index) {
-
+      $state.go('^.report_detail', {report_object: $scope.report_list[index]})
     }
 
     // Report List UI

@@ -35,6 +35,13 @@ nirApp.config(['$translateProvider',
       MSG_NO_REPORT_DATA_FOUND: "没有找到符合条件的报告",
       CAPTION_DELETE_REPORT: "删除报告",
       MSG_REMOVE_REPORT_CONFIRM:"请确认是否删除如下报告：",
+      // Report Detail UI
+      CAPTION_EDIT_REPORT: "编辑报告",
+      CAPTION_NEW_REPORT: "新建报告",
+      CAPTION_CREATION_DATE: "创建日期",
+      CAPTION_CREATION_TIME: "创建时间",
+      CAPTION_REPORT_DEPARTMENT: "所属部门",
+      CAPTION_REPORT_ISSUE: "事件类型",
       // Config UI
       TITLE_CONFIG: "配置",
       CAPTION_DEPARTMENT_LIST: "部门列表",

@@ -25,6 +25,14 @@ nirApp.config(['$stateProvider', '$urlRouterProvider',
         templateUrl: 'components/report/report.component.html',
         controller: 'ReportController'
       })
+      .state('root.report_detail', {
+        url: 'report_detail',
+        params: {
+          report_object: undefined,
+        },
+        templateUrl: 'components/report/report_detail/report_detail.component.html',
+        controller: 'ReportDetailController'
+      })
       .state('root.config', {
         url: 'config',
         params: {

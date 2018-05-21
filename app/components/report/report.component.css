@@ -12,3 +12,7 @@
 .report .table > tbody > tr > td {
   vertical-align: middle;
 }
+
+.report .row {
+  margin-bottom: 10px;
+}

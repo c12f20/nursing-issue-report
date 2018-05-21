@@ -125,9 +125,9 @@ nirServices.factory('DepartmentService', ['$q', 'DbService',
       let deferred = $q.defer();
 
       __init().then((db) => {
-        console.log(`Query departments offset: ${offset}, count: ${count}`);
         offset = offset ? offset : 0;
         count = count ? count : -1;
+        console.log(`Query departments offset: ${offset}, count: ${count}`);
         let sql = `SELECT id, name FROM tblDepartment LIMIT ${count} OFFSET ${offset}`;
         db.all(sql, [], (err, rows) => {
           if (err) {

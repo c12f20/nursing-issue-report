@@ -1,8 +1,8 @@
 'use strict';
 
-nirControllers.controller('HomeController', ['$scope', '$translate',
-  function($scope, $translate) {
-    $scope.switchLang = function(countryCode) {
-      $translate.use(countryCode);
+nirControllers.controller('HomeController', ['$scope', '$state',
+  function($scope, $state) {
+    $scope.onNewReport = function() {
+      $state.go('^.report_detail');
     }
   }]);

@@ -7,7 +7,7 @@
       <label>{{'CAPTION_START_DATE' | translate}}</label>
       <p class="input-group">
         <input type="text" class="form-control" uib-datepicker-popup ng-model="date_range.start" ng-change="onStartDateChanged()" is-open="start_date_popup.opened"
-          datepicker-options="dateOptions" ng-required="true" close-text="{{'CAPTION_CLOSE' | translate}}" current-text="{{'CAPTION_TODAY' | translate}}" clear-text="{{'CAPTION_CLEAR' | translate}}"/>
+          ng-required="true" close-text="{{'CAPTION_CLOSE' | translate}}" current-text="{{'CAPTION_TODAY' | translate}}" clear-text="{{'CAPTION_CLEAR' | translate}}"/>
         <span class="input-group-btn">
           <button type="button" class="btn btn-default" ng-click="openStartDatePopup()"><i class="glyphicon glyphicon-calendar"></i></button>
         </span>
@@ -17,7 +17,7 @@
       <label>{{'CAPTION_END_DATE' | translate}}</label>
       <p class="input-group">
         <input type="text" class="form-control" uib-datepicker-popup ng-model="date_range.end" ng-change="onEndDateChanged()" is-open="end_date_popup.opened"
-          datepicker-options="dateOptions" ng-required="true" close-text="{{'CAPTION_CLOSE' | translate}}" current-text="{{'CAPTION_TODAY' | translate}}" clear-text="{{'CAPTION_CLEAR' | translate}}" />
+          ng-required="true" close-text="{{'CAPTION_CLOSE' | translate}}" current-text="{{'CAPTION_TODAY' | translate}}" clear-text="{{'CAPTION_CLEAR' | translate}}" />
         <span class="input-group-btn">
           <button type="button" class="btn btn-default" ng-click="openEndDatePopup()"><i class="glyphicon glyphicon-calendar"></i></button>
         </span>
