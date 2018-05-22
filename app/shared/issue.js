@@ -26,6 +26,10 @@ class Issue {
     return this.__options;
   }
 
+  hasOptions() {
+    return this.__options && this.__options.length > 0;
+  }
+
   equals(other) {
     if (!other || !(other instanceof Issue)) {
       return false;

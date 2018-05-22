@@ -19,7 +19,7 @@ nirServices.factory('ReportService', ['$q', 'DbService',
       if (!department_id || !issue_id
       || !creation_time || !(creation_time instanceof Date)) {
         deferred.reject(new Error("Failed to add report with invalid parameters"));
-        return;
+        return deferred.promise;
       }
       __init().then((db) => {
         let creation_timestamp = creation_time.getTime()/1000;
@@ -42,7 +42,7 @@ nirServices.factory('ReportService', ['$q', 'DbService',
       let deferred = $q.defer();
       if (!report_id) {
         deferred.reject(new Error("Failed to remove report with invalid report id"));
-        return;
+        return deferred.promise;
       }
       __init().then((db) => {
         db.run(`DELETE FROM tblReport where id = ${report_id}`,
@@ -66,7 +66,7 @@ nirServices.factory('ReportService', ['$q', 'DbService',
       || !report_object.issue || !(report_object.issue instanceof Issue)
       || !report_object.creation_time || !(report_object.creation_time instanceof Date)) {
         deferred.reject(new Error("Failed to update report with invalid parameters"));
-        return;
+        return deferred.promise;
       }
       __init().then((db) => {
         let department_object = report_object.department_object;
@@ -185,12 +185,40 @@ nirServices.factory('ReportService', ['$q', 'DbService',
       return deferred.promise;
     }
 
+    function queryReportDetails(report_object) {
+      let deferred = $q.defer();
+      if (!report_object || !(report_object instanceof Report)
+      || !report_object.id) {
+        deferred.reject(new Error("Failed to query report details with invalid report object"));
+        return deferred.promise;
+      }
+
+      __init().then((db) => {
+        let sql = "SELECT id, option_id, option_value WHERE report_id = ?";
+        db.all(sql, [report_object.id], (err, rows) => {
+          if (err) {
+            deferred.reject(new Error(`Failed to query report details with id ${report_object.id}, sql: ${sql}, error: ${err.message}`));
+            return;
+          }
+          rows.forEach((row) => {
+
+          });
+          deferred.resolve();
+        });
+      }, (err) => {
+        deferred.reject(err);
+      });
+
+      return deferred.promise;
+    }
+
     return {
       addReport: addReport,
       removeReport: removeReport,
       updateReport: updateReport,
       queryReportsCount: queryReportsCountInDataRange,
       queryReportsMinCreationTime, queryReportsMinCreationTime,
-      queryReports: queryReportsInDateRange
+      queryReports: queryReportsInDateRange,
+      queryReportDetails: queryReportDetails,
     }
   }]);

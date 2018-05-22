@@ -47,4 +47,18 @@ class Report {
   get creation_time_string() {
     return this.__creation_time.toLocaleString('zh-CN', {hour12: false});
   }
+
+  equals(other) {
+    if (!other || !(other instanceof Report)) {
+      return false;
+    }
+    return this.__id == other.id && this.__department_object.equals(other.department)
+      && this.__issue_object.equals(other.issue) && this.__creation_time == other.creation_time;
+  }
+
+  clone() {
+    let new_obj = new Report(this.__id, this.__department_object.clone(), this.__issue_object.clone());
+    new_obj.creation_time = new Date(this.__creation_time);
+    return new_obj;
+  }
 }

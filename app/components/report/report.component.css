@@ -16,3 +16,16 @@
 .report .row {
   margin-bottom: 10px;
 }
+
+.report .row .panel {
+  margin-bottom: 0px;
+}
+
+.report .row .option_item {
+  margin-bottom: 10px;
+}
+
+.report .uib-separator {
+  padding-left: 3px;
+  padding-right: 3px;
+}

@@ -23,6 +23,11 @@ body {
   margin-top: 5px;
 }
 
+.root-container .right-container {
+  max-height: 100%;
+  overflow-y: auto;
+}
+
 .dialog-content h2 {
   margin-top: 10px;
   margin-bottom: 20px;

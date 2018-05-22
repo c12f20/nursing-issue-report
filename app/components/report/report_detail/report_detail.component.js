@@ -36,24 +36,39 @@ nirControllers.controller('ReportDetailController', ['$scope', '$filter', '$stat
         })
     }
 
+    function query_report_details() {
+      issueService.queryIssueDetail($scope.editing_report.issue)
+        .then((issue) => {
+          $scope.editing_report.issue = issue;
+          return reportService.queryReportDetails($scope.editing_report);
+        })
+        .then(() => {
+
+        }, (err) => {
+          console.error(err);
+        })
+    }
+
     $scope.issues_list = [];
     function load_issues() {
       issueService.queryIssues()
         .then((list) => {
           $scope.issues_list = list;
           if (list && list.length > 0) {
-            if (!$scope.editing_report.issue) {
+            if (!$scope.editing_report.issue) { // new report
               $scope.editing_report.issue = list[0];
               $scope.selected_issue = list[0];
-            } else {
+              query_selected_issue();
+            } else { // editing report
               for (let i=0; i < list.length; i++) {
                 if ($scope.editing_report.issue.id == list[i].id && $scope.editing_report.issue.name == list[i].name) {
+                  $scope.editing_report.issue = list[i];
                   $scope.selected_issue = list[i];
+                  query_report_details();
                   break;
                 }
               }
             }
-            query_selected_issue();
           }
         }, (err) => {
           console.error(err);
@@ -86,9 +101,11 @@ nirControllers.controller('ReportDetailController', ['$scope', '$filter', '$stat
     $scope.page_info = {
       title: $filter('translate')('CAPTION_NEW_REPORT'),
     }
+    let orig_report = undefined;
     $scope.editing_report = undefined;
     function load_editing_data() {
       $scope.page_info.title = $filter('translate')('CAPTION_EDIT_REPORT');
+      orig_report = $stateParams.report_object.clone();
       $scope.editing_report = $stateParams.report_object;
     }
 

@@ -10,7 +10,9 @@ class Option {
     if (!this.__value_names) {
       throw new Error("value_names of Option can't be undefined");
     }
-    this.__value_index = 0; // first value always be default one
+    if (this.__value_names.length > 0) {
+      this.__value = this.__value_names[0]; // default value shall be first value of value_names
+    }
     this.__children = [];
   }
 
@@ -52,6 +54,9 @@ class Option {
 
   set value_names(value_names) {
     this.__value_names = value_names;
+    if (value_names && value_names.length > 0) {
+      this.__value = value_names[0]; // default value shall be first value of value_names
+    }
   }
 
   get value_names() {
@@ -66,24 +71,28 @@ class Option {
     return this.__children;
   }
 
-  set value_index(index) {
-    this.__value_index = index;
+  hasChildren() {
+    return this.__children.length > 0;
   }
 
-  get value_index() {
-    return this.__value_index;
+  set value(value) {
+    this.__value = value;
   }
 
   get value() {
-    if (this.__value_index >= 0 && this.__value_index < this.__value_names.length) {
-      return this.__value_names[this.__value_index];
-    } else {
-      return undefined;
-    }
+    return this.__value;
   }
 
-  is_calculable() {
-    return this.__value_names && this.__value_names.length > 0;
+  set value_id(value_id) {
+    this.__value_id = value_id;
+  }
+
+  get value_id() {
+    return this.__value_id;
+  }
+
+  isCalculable() {
+    return this.__children.length == 0;
   }
 
   equals(other) {
@@ -91,7 +100,8 @@ class Option {
       return false;
     }
     if (!(this.__id == other.id && this.__index == other.__index && this.__name == other.name && this.__parent_name == other.parent_name
-    && JSON.stringify(this.__value_names) == JSON.stringify(other.value_names))) {
+    && JSON.stringify(this.__value_names) == JSON.stringify(other.value_names)
+    && this.__value == other.value && this.__value_id == other.value_id)) {
       return false;
     };
 
@@ -111,7 +121,7 @@ class Option {
     let new_obj = new Option(this.__id, this.__name, new_value_names);
     new_obj.index = this.__index;
     new_obj.parent_name = this.__parent_name;
-    new_obj.value_index = this.__value_index;
+    new_obj.value = this.__value;
     if (this.__children) {
       let new_children = [];
       for (let i=0; i < this.__children.length; i++) {
