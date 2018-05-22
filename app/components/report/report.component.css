@@ -29,3 +29,11 @@
   padding-left: 3px;
   padding-right: 3px;
 }
+
+.report .btn-double-group button {
+  width: 49%;
+}
+
+.report .btn-double-group button:last-child {
+  float:right !important;
+}

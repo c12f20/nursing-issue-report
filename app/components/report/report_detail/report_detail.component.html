@@ -47,4 +47,8 @@
       </div>
     </div>
   </div>
+  <p class="btn-double-group">
+    <button class="btn btn-primary" ng-click="onSaveReport()" ng-disabled="!isReportChanged()">{{'CAPTION_SAVE' | translate}}</button>
+    <button class="btn btn-danger" ng-click="onCancel()" >{{'CAPTION_CANCEL' | translate}}</button>
+  </p>
 </div>

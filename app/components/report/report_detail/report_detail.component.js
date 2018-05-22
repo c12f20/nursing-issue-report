@@ -25,8 +25,27 @@ nirControllers.controller('ReportDetailController', ['$scope', '$filter', '$stat
       $scope.editing_report.issue = $scope.selected_issue;
       query_selected_issue();
     }
-    // Load data methods
+    // Save/Cancel Buttons
+    $scope.isReportChanged = function() {
+      return !$scope.editing_report.equals(orig_report);;
+    }
 
+    function exitPage() {
+      if (orig_report) {
+        $state.go('^.report');
+      } else {
+        $state.go('^.home');
+      }
+    }
+
+    $scope.onSaveReport = function() {
+      exitPage();
+    }
+
+    $scope.onCancel = function() {
+      exitPage();
+    }
+    // Load data methods
     function query_selected_issue() {
       issueService.queryIssueDetail($scope.editing_report.issue)
         .then((issue) => {
@@ -43,7 +62,7 @@ nirControllers.controller('ReportDetailController', ['$scope', '$filter', '$stat
           return reportService.queryReportDetails($scope.editing_report);
         })
         .then(() => {
-
+          orig_report = $scope.editing_report.clone();
         }, (err) => {
           console.error(err);
         })
@@ -105,7 +124,6 @@ nirControllers.controller('ReportDetailController', ['$scope', '$filter', '$stat
     $scope.editing_report = undefined;
     function load_editing_data() {
       $scope.page_info.title = $filter('translate')('CAPTION_EDIT_REPORT');
-      orig_report = $stateParams.report_object.clone();
       $scope.editing_report = $stateParams.report_object;
     }
 

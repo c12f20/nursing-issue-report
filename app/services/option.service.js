@@ -140,6 +140,24 @@ nirServices.factory('OptionService', ['$q', 'DbService',
       return deferred.promise;
     }
     // List part
+    function getOptionById(options_list, id) {
+      if (!options_list) {
+        return undefined;
+      }
+
+      for (let i=0; i < options_list.length; i++) {
+        let option = options_list[i];
+        if (option.id == id) {
+          return option;
+        }
+        let child_option = getOptionById(option.children, id);
+        if (child_option) {
+          return child_option;
+        }
+      }
+      return undefined;
+    }
+
     function getRootOptionByName(options_list, name) {
       if (!options_list) {
         return undefined;
@@ -192,6 +210,7 @@ nirServices.factory('OptionService', ['$q', 'DbService',
       updateOptionWithTransaction: updateOptionWithTransaction,
       queryIssueOptions: queryOptionsByIssueId,
       // List part
+      getOptionById:getOptionById,
       getRootOptionByName:getRootOptionByName,
       convertOptionTreeToList: convertOptionTreeToList,
       updateListIndex: updateListIndex,

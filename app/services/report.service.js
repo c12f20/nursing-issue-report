@@ -1,7 +1,7 @@
 'use strict';
 
-nirServices.factory('ReportService', ['$q', 'DbService',
-  function($q, dbService) {
+nirServices.factory('ReportService', ['$q', 'DbService', 'OptionService',
+  function($q, dbService, optionService) {
     let db = undefined;
     function __init() {
       let deferred = $q.defer();
@@ -188,20 +188,29 @@ nirServices.factory('ReportService', ['$q', 'DbService',
     function queryReportDetails(report_object) {
       let deferred = $q.defer();
       if (!report_object || !(report_object instanceof Report)
-      || !report_object.id) {
+      || !report_object.id || !report_object.issue) {
         deferred.reject(new Error("Failed to query report details with invalid report object"));
         return deferred.promise;
       }
 
+      if (!report_object.issue.options || report_object.issue.options.length == 0) { // no options, no need to query values
+        deferred.resolve();
+        return deferred.promise;
+      }
+
       __init().then((db) => {
-        let sql = "SELECT id, option_id, option_value WHERE report_id = ?";
+        let sql = "SELECT id, option_id, option_value FROM tblReportDetail WHERE report_id = ?";
         db.all(sql, [report_object.id], (err, rows) => {
           if (err) {
             deferred.reject(new Error(`Failed to query report details with id ${report_object.id}, sql: ${sql}, error: ${err.message}`));
             return;
           }
           rows.forEach((row) => {
-
+            let option = optionService.getOptionById(row.option_id);
+            if (option) {
+              option.value_id = row.id;
+              option.value = row.option_value;
+            }
           });
           deferred.resolve();
         });
