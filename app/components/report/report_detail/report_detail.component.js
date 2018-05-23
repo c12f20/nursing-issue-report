@@ -1,7 +1,7 @@
 'use strict';
 
-nirControllers.controller('ReportDetailController', ['$scope', '$filter', '$state', '$stateParams', 'ReportService', 'DepartmentService', 'IssueService',
-  function($scope, $filter, $state, $stateParams, reportService, departmentService, issueService) {
+nirControllers.controller('ReportDetailController', ['$scope', '$filter', '$state', '$stateParams', 'ReportService', 'DepartmentService', 'IssueService', 'OptionService',
+  function($scope, $filter, $state, $stateParams, reportService, departmentService, issueService, optionService) {
     // Creation Date UI part
     $scope.creation_date_popup = {
       opened: false
@@ -26,8 +26,15 @@ nirControllers.controller('ReportDetailController', ['$scope', '$filter', '$stat
       query_selected_issue();
     }
     // Save/Cancel Buttons
+    $scope.isReportValid = function() {
+      if (!$scope.editing_report || !$scope.editing_report.issue) {
+        return true;
+      }
+      return optionService.isOptionTreeValueValid($scope.editing_report.issue.options);
+    }
+
     $scope.isReportChanged = function() {
-      return !$scope.editing_report.equals(orig_report);;
+      return !$scope.editing_report.equals(orig_report);
     }
 
     function exitPage() {
@@ -39,7 +46,21 @@ nirControllers.controller('ReportDetailController', ['$scope', '$filter', '$stat
     }
 
     $scope.onSaveReport = function() {
-      exitPage();
+      let result;
+      if (orig_report) { // It's editing report
+        let remove_options = undefined;
+        if (orig_report.issue.id != $scope.editing_report.issue.id) {
+          remove_options = orig_report.issue.options;
+        }
+        result = reportService.updateReport($scope.editing_report, remove_options);
+      } else { // It's new report
+        result = reportService.addReport($scope.editing_report);
+      }
+      result.then(null, (err) => {
+        console.error(err);
+      }).finally(() => {
+        exitPage();
+      });
     }
 
     $scope.onCancel = function() {

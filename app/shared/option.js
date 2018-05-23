@@ -91,6 +91,13 @@ class Option {
     return this.__value_id;
   }
 
+  isValueValid() {
+    if (!this.isCalculable()) {
+      return true;
+    }
+    return this.value && this.value.length > 0;
+  }
+
   isCalculable() {
     return this.__children.length == 0;
   }

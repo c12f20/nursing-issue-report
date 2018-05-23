@@ -13,6 +13,7 @@ nirServices.factory('OptionService', ['$q', 'DbService',
       return deferred.promise;
     }
 
+    // Option table related methods
     function addOptionWithTransaction(transaction, issue_id, option_object) {
       let deferred = $q.defer();
       if (!transaction || !issue_id || !option_object || !option_object.name || option_object.name.length == 0
@@ -139,7 +140,68 @@ nirServices.factory('OptionService', ['$q', 'DbService',
       });
       return deferred.promise;
     }
-    // List part
+    // ReportDetail table related methods
+    function addOptionValueWithTransaction(transaction, report_id, option_object) {
+      let deferred = $q.defer();
+      if (!transaction || !report_id || !option_object || !option_object.value
+        || option_object.value.length == 0) {
+        deferred.reject(new Error("Failed to add option value with invalid parameters"));
+        return deferred.promise;
+      }
+      let sql = "INSERT INTO tblReportDetail (report_id, option_id, option_value) VALUES (?, ?, ?)";
+      transaction.run(sql, [report_id, option_object.id, option_object.value],
+        (err) => {
+          if (err) {
+            deferred.reject(new Error(`Failed to add option value, error: ${err.message}`));
+            return;
+          }
+          deferred.resolve();
+        });
+      return deferred.promise;
+    }
+
+    function updateOptionValueWithTransaction(transaction, report_id, option_object) {
+      let deferred = $q.defer();
+      if (!transaction || !report_id || !option_object || !option_object.id || !option_object.value
+        || option_object.value.length == 0) {
+        deferred.reject(new Error("Failed to update option value with invalid parameters"));
+        return deferred.promise;
+      }
+      let sql = `UPDATE tblReportDetail SET
+        report_id = '${report_id}',
+        option_id = '${option_object.id}',
+        option_value = '${option_object.value}'
+        WHERE id = ${option_object.value_id}`;
+      transaction.run(sql, [],
+        (err) => {
+          if (err) {
+            deferred.reject(new Error(`Failed to update option value, error: ${err.message}`));
+            return;
+          }
+          deferred.resolve();
+        });
+      return deferred.promise;
+    }
+
+    function removeOptionValueWithTransaction(transaction, option_value_id) {
+      let deferred = $q.defer();
+      if (!transaction || !option_value_id) {
+        deferred.reject(new Error("Failed to delete option value with invalid parameters"));
+        return deferred.promise;
+      }
+      let sql = `DELETE FROM tblReportDetail WHERE id = ${option_value_id}`;
+      transaction.run(sql, [],
+        (err) => {
+          if (err) {
+            deferred.reject(new Error(`Failed to delete option value, error: ${err.message}`));
+            return;
+          }
+          deferred.resolve();
+        });
+      return deferred.promise;
+    }
+
+    // Option List related methods
     function getOptionById(options_list, id) {
       if (!options_list) {
         return undefined;
@@ -202,17 +264,40 @@ nirServices.factory('OptionService', ['$q', 'DbService',
       }
     }
 
+    function isOptionTreeValueValid(options_tree) {
+      if (!options_tree) {
+        return true;
+      }
+      for (let i=0; i < options_tree.length; i++) {
+        let option = options_tree[i];
+        if (!option.isValueValid()) {
+          return false;
+        }
+        if (option.hasChildren()) {
+          if (!isOptionTreeValueValid(option.children)) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
     return {
-      // Database part
+      // Option Table part
       addOptionWithTransaction: addOptionWithTransaction,
       removeOption: removeOption,
       removeOptionsWithTransaction: removeOptionsWithTransaction,
       updateOptionWithTransaction: updateOptionWithTransaction,
       queryIssueOptions: queryOptionsByIssueId,
-      // List part
+      // Report Detail Table part
+      addOptionValueWithTransaction: addOptionValueWithTransaction,
+      removeOptionValueWithTransaction: removeOptionValueWithTransaction,
+      updateOptionValueWithTransaction: updateOptionValueWithTransaction,
+      // Option List part
       getOptionById:getOptionById,
       getRootOptionByName:getRootOptionByName,
       convertOptionTreeToList: convertOptionTreeToList,
       updateListIndex: updateListIndex,
+      isOptionTreeValueValid: isOptionTreeValueValid,
     }
   }]);

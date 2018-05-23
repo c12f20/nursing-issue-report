@@ -14,24 +14,66 @@ nirServices.factory('ReportService', ['$q', 'DbService', 'OptionService',
     }
 
     // Report related methods
-    function addReport(department_id, issue_id, creation_time) {
+    function __addReportDetail(transaction, report_id, options_tree) {
       let deferred = $q.defer();
-      if (!department_id || !issue_id
-      || !creation_time || !(creation_time instanceof Date)) {
+      if (!options_tree || options_tree.length == 0) {
+        deferred.resolve();
+        return deferred.promise;
+      }
+      let options_list = optionService.convertOptionTreeToList(options_tree);
+      for (let i=0; i < options_list.length; i++) {
+        let option = options_list[i];
+        optionService.addOptionValueWithTransaction(transaction, report_id, option)
+          .then(() => {
+            if (i == options_list.length-1) { // last element
+              deferred.resolve();
+            }
+          }, (err) => {
+            deferred.reject(err);
+          });
+      }
+      return deferred.promise;
+    }
+
+    function addReport(report_object) {
+      let deferred = $q.defer();
+      if (!report_object || !(report_object instanceof Report)
+      || !report_object.department || !(report_object.department instanceof Department)
+      || !report_object.issue || !(report_object.issue instanceof Issue)
+      || !report_object.creation_time || !(report_object.creation_time instanceof Date)) {
         deferred.reject(new Error("Failed to add report with invalid parameters"));
         return deferred.promise;
       }
       __init().then((db) => {
-        let creation_timestamp = creation_time.getTime()/1000;
-        db.run(`INSERT INTO tblReport (department_id, issue_id, creation_time)
-          VALUES (${department_id}, ${issue_id}, ${creation_timestamp})`,
-          (err) => {
-            if (err) {
-              deferred.reject(new Error(`Failed to add report, error: ${err.message}`));
-              return;
-            }
-            deferred.resolve();
-          });
+        db.beginTransaction((err, transaction) => {
+          if (err) {
+            deferred.reject(err);
+            return;
+          }
+          let department_id = report_object.department.id;
+          let issue_id = report_object.issue.id;
+          let creation_timestamp = report_object.creation_time.getTime()/1000;
+          let sql = "INSERT INTO tblReport (department_id, issue_id, creation_time) VALUES (?, ? ,?)";
+          transaction.run(sql, [department_id, issue_id, creation_timestamp],
+            function(err) {
+              if (err) {
+                deferred.reject(new Error(`Failed to add report, error: ${err.message}`));
+                return;
+              }
+              __addReportDetail(transaction, this.lastID, report_object.issue.options)
+                .then(() => {
+                  transaction.commit((err) => {
+                    if (err) {
+                      deferred.reject(err);
+                      return;
+                    }
+                    deferred.resolve();
+                  });
+                }, (err) => {
+                  deferred.reject(err);
+                });
+            });
+        });
       }, (err) => {
         deferred.reject(err);
       });
@@ -45,7 +87,8 @@ nirServices.factory('ReportService', ['$q', 'DbService', 'OptionService',
         return deferred.promise;
       }
       __init().then((db) => {
-        db.run(`DELETE FROM tblReport where id = ${report_id}`,
+        let sql = "DELETE FROM tblReport where id=?";
+        db.run(sql, report_id,
           (err) => {
             if (err) {
               deferred.reject(new Error(`Failed to remove report ${report_id}, error: ${err.message}`));
@@ -59,31 +102,103 @@ nirServices.factory('ReportService', ['$q', 'DbService', 'OptionService',
       return deferred.promise;
     }
 
-    function updateReport(report_object) {
+    function __removeReportDetail(transaction, options_tree) {
+      let deferred = $q.defer();
+      if (!options_tree || options_tree.length == 0) {
+        deferred.resolve();
+        return deferred.promise;
+      }
+      let options_list = optionService.convertOptionTreeToList(options_tree);
+      for (let i=0; i < options_list.length; i++) {
+        let option = options_list[i];
+        if (!option.value_id) {
+          continue;
+        }
+        optionService.removeOptionValueWithTransaction(transaction, option.value_id)
+          .then(() => {
+            if (i == options_list.length-1) { // last element
+              deferred.resolve();
+            }
+          }, (err) => {
+            deferred.reject(err);
+          });
+      }
+      return deferred.promise;
+    }
+
+    function __updateReportDetail(transaction, report_id, options_tree) {
+      let deferred = $q.defer();
+      if (!options_tree || options_tree.length == 0) {
+        deferred.resolve();
+        return deferred.promise;
+      }
+
+      let options_list = optionService.convertOptionTreeToList(options_tree);
+      for (let i=0; i < options_list.length; i++) {
+        let option = options_list[i];
+        let result;
+        if (option.value_id) {
+          result = optionService.updateOptionValueWithTransaction(transaction, report_id, option);
+        } else {
+          result = optionService.addOptionValueWithTransaction(transaction, report_id, option);
+        }
+        result.then(() => {
+          if (i == options_list.length-1) { // last element
+            deferred.resolve();
+          }
+        }, (err) => {
+          deferred.reject(err);
+        });
+      }
+      return deferred.promise;
+    }
+
+    function updateReport(report_object, remove_options) {
       let deferred = $q.defer();
       if (!report_object || !report_object.id
-      || !report_object.department_object || !(report_object.department_object instanceof Department)
+      || !report_object.department || !(report_object.department instanceof Department)
       || !report_object.issue || !(report_object.issue instanceof Issue)
       || !report_object.creation_time || !(report_object.creation_time instanceof Date)) {
         deferred.reject(new Error("Failed to update report with invalid parameters"));
         return deferred.promise;
       }
       __init().then((db) => {
-        let department_object = report_object.department_object;
-        let issue_object = report_object.issue;
-        let creation_timestamp = report_object.creation_time.getTime()/1000;
-        db.run(`UPDATE tblReport SET
-          department_id = ${department_object.id},
-          issue_id = ${issue_object.id},
-          creation_time = ${creation_timestamp},
-          WHERE id = ${report_object.id}`,
-          (err) => {
-            if (err) {
-              deferred.reject(new Error(`Failed to update report ${report_object.id}, error: ${err.message}`));
-              return;
-            }
-            deferred.resolve();
-          });
+        db.beginTransaction((err, transaction) => {
+          if (err) {
+            deferred.reject(err);
+            return;
+          }
+          let department_object = report_object.department;
+          let issue_object = report_object.issue;
+          let creation_timestamp = report_object.creation_time.getTime()/1000;
+          let sql = `UPDATE tblReport SET
+            department_id = ${department_object.id},
+            issue_id = ${issue_object.id},
+            creation_time = ${creation_timestamp},
+            WHERE id = ${report_object.id}`;
+          transaction.run(sql, [],
+            (err) => {
+              if (err) {
+                deferred.reject(new Error(`Failed to update report ${report_object.id}, error: ${err.message}`));
+                return;
+              }
+              __updateReportDetail(transaction, report_object.id, report_object.issue.options)
+                .then(() => {
+                  return __removeReportDetail(transaction, remove_options);
+                })
+                .then(() => {
+                  transaction.commit((err) => {
+                    if (err) {
+                      deferred.reject(err);
+                      return;
+                    }
+                    deferred.resolve();
+                  });
+                }, (err) => {
+                  deferred.reject(err);
+                });
+            });
+        });
       }, (err) => {
         deferred.reject(err);
       })
@@ -200,13 +315,13 @@ nirServices.factory('ReportService', ['$q', 'DbService', 'OptionService',
 
       __init().then((db) => {
         let sql = "SELECT id, option_id, option_value FROM tblReportDetail WHERE report_id = ?";
-        db.all(sql, [report_object.id], (err, rows) => {
+        db.all(sql, report_object.id, (err, rows) => {
           if (err) {
             deferred.reject(new Error(`Failed to query report details with id ${report_object.id}, sql: ${sql}, error: ${err.message}`));
             return;
           }
           rows.forEach((row) => {
-            let option = optionService.getOptionById(row.option_id);
+            let option = optionService.getOptionById(repot_object.issue.options, row.option_id);
             if (option) {
               option.value_id = row.id;
               option.value = row.option_value;
