@@ -129,6 +129,7 @@ class Option {
     new_obj.index = this.__index;
     new_obj.parent_name = this.__parent_name;
     new_obj.value = this.__value;
+    new_obj.value_id = this.__value_id;
     if (this.__children) {
       let new_children = [];
       for (let i=0; i < this.__children.length; i++) {

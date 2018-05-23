@@ -23,6 +23,9 @@ nirServices.factory('ReportService', ['$q', 'DbService', 'OptionService',
       let options_list = optionService.convertOptionTreeToList(options_tree);
       for (let i=0; i < options_list.length; i++) {
         let option = options_list[i];
+        if (!option.isCalculable()) {
+          continue;
+        }
         optionService.addOptionValueWithTransaction(transaction, report_id, option)
           .then(() => {
             if (i == options_list.length-1) { // last element
@@ -111,6 +114,9 @@ nirServices.factory('ReportService', ['$q', 'DbService', 'OptionService',
       let options_list = optionService.convertOptionTreeToList(options_tree);
       for (let i=0; i < options_list.length; i++) {
         let option = options_list[i];
+        if (!option.isCalculable()) {
+          continue;
+        }
         if (!option.value_id) {
           continue;
         }
@@ -136,6 +142,9 @@ nirServices.factory('ReportService', ['$q', 'DbService', 'OptionService',
       let options_list = optionService.convertOptionTreeToList(options_tree);
       for (let i=0; i < options_list.length; i++) {
         let option = options_list[i];
+        if (!option.isCalculable()) {
+          continue;
+        }
         let result;
         if (option.value_id) {
           result = optionService.updateOptionValueWithTransaction(transaction, report_id, option);
@@ -170,16 +179,16 @@ nirServices.factory('ReportService', ['$q', 'DbService', 'OptionService',
           }
           let department_object = report_object.department;
           let issue_object = report_object.issue;
-          let creation_timestamp = report_object.creation_time.getTime()/1000;
+          let creation_timestamp = Math.floor(report_object.creation_time.getTime()/1000);
           let sql = `UPDATE tblReport SET
             department_id = ${department_object.id},
             issue_id = ${issue_object.id},
-            creation_time = ${creation_timestamp},
+            creation_time = ${creation_timestamp}
             WHERE id = ${report_object.id}`;
           transaction.run(sql, [],
             (err) => {
               if (err) {
-                deferred.reject(new Error(`Failed to update report ${report_object.id}, error: ${err.message}`));
+                deferred.reject(new Error(`Failed to update report ${report_object.id}, sql: ${sql}, error: ${err.message}`));
                 return;
               }
               __updateReportDetail(transaction, report_object.id, report_object.issue.options)
@@ -321,7 +330,7 @@ nirServices.factory('ReportService', ['$q', 'DbService', 'OptionService',
             return;
           }
           rows.forEach((row) => {
-            let option = optionService.getOptionById(repot_object.issue.options, row.option_id);
+            let option = optionService.getOptionById(report_object.issue.options, row.option_id);
             if (option) {
               option.value_id = row.id;
               option.value = row.option_value;
