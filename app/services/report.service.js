@@ -305,7 +305,35 @@ nirServices.factory('ReportService', ['$q', 'DbService', 'OptionService',
       }, (err) => {
         deferred.reject(err);
       });
+      return deferred.promise;
+    }
 
+    function queryReportsByDepartmentInDateRange(department_id, start_date, end_date) {
+      let deferred = $q.defer();
+      __init().then((db) => {
+        let where_clause = buildQueryWhereClause(start_date, end_date);
+        if (where_clause.length == 0) {
+          where_clause = `WHERE department_id=${department_id}`;
+        } else {
+          where_clause += ` and department_id=${department_id}`;
+        }
+        let sql = `SELECT issue_id, count(issue_id) issue_count
+          FROM tblReport ${where_clause}
+          GROUP BY issue_id`;
+        db.all(sql, [], (err, rows) => {
+          if (err) {
+            deferred.reject(new Error(`Failed to query reports by department, sql: ${sql}, error: ${err.message}`));
+            return;
+          }
+          let result_dict = {};
+          rows.forEach((row) => {
+            result_dict[row.issue_id] = row.issue_count;
+          });
+          deferred.resolve(result_dict);
+        });
+      }, (err) => {
+        deferred.reject(err);
+      });
       return deferred.promise;
     }
 
@@ -352,6 +380,7 @@ nirServices.factory('ReportService', ['$q', 'DbService', 'OptionService',
       queryReportsCount: queryReportsCountInDataRange,
       queryReportsMinCreationTime, queryReportsMinCreationTime,
       queryReports: queryReportsInDateRange,
+      queryReportsByDepartment: queryReportsByDepartmentInDateRange,
       queryReportDetails: queryReportDetails,
     }
   }]);
