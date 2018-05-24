@@ -29,14 +29,6 @@
   width: 15%;
 }
 
-.config .btn-double-group button {
-  width: 49%;
-}
-
-.config .btn-double-group button:last-child {
-  float:right !important;
-}
-
 .config .form-group label {
   font-size: 20px;
 }

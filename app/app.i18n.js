@@ -44,6 +44,9 @@ nirApp.config(['$translateProvider',
       CAPTION_REPORT_DEPARTMENT: "所属部门",
       CAPTION_REPORT_ISSUE: "事件类型",
       TITLE_REPORT_OPTIONS: "事件统计项：",
+      // Report Generator UI
+      CAPTION_GENERATE_REPORT: "生成报告",
+      CAPTION_SELECT_GENERATE_DATE_RANGE: "请选择生成报告的日期范围：",
       // Config UI
       TITLE_CONFIG: "配置",
       CAPTION_DEPARTMENT_LIST: "部门列表",

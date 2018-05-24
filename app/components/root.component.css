@@ -24,8 +24,16 @@ body {
 }
 
 .root-container .right-container {
-  max-height: 100%;
+  height: 100%;
   overflow-y: auto;
+}
+
+.root-container .right-container .btn-double-group button {
+  width: 49%;
+}
+
+.root-container .right-container .btn-double-group button:last-child {
+  float:right !important;
 }
 
 .dialog-content h2 {
