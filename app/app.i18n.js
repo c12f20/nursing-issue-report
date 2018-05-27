@@ -79,6 +79,9 @@ nirApp.config(['$translateProvider',
       CAPTION_OPTION_VALUE_NAME: "统计项目可选值",
       HINT_INPUT_OPTION_VALUE_NAME: "请输入统计项目可选值名称",
       CAPTION_ADD_OPTION_VALUE: "添加统计项目可选值",
+      // Report Content
+      DEFAULT_REPORT_NAME: "不良事件分析报告",
+      CAPTION_TOTAL: "合计",
     };
 
     $translateProvider
