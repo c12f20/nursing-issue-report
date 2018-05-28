@@ -114,7 +114,7 @@ nirControllers.controller('ReportController', ['$scope', '$filter', '$state', 'R
       if (!$scope.date_range.start) {
         reportService.queryReportsMinCreationTime()
           .then((min_creation_time) => {
-            $scope.date_range.start = new Date(min_creation_time);
+            $scope.date_range.start = new Date(min_creation_time*1000);
           }, (err) => {
             console.error(err);
           });

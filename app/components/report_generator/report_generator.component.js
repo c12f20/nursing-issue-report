@@ -80,7 +80,7 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
           departments_list = list;
           let queryIssueInfoByDepartmentPromisesDict = {};
           for (let i=0; i < departments_list.length; i++) {
-            let department_id = departments_list[0].id;
+            let department_id = departments_list[i].id;
             queryIssueInfoByDepartmentPromisesDict[department_id] =
               reportService.queryIssueInfoByDepartment(department_id, $scope.date_range.start, $scope.date_range.end);
           }
@@ -97,7 +97,7 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
     }
 
     $scope.onGenerateReport = function() {
-      docxService.initReportDocx("D:\\", $scope.date_range.start, $scope.date_range.end);
+      docxService.initReportDocx("/Users/hill/", $scope.date_range.start, $scope.date_range.end);
       docxService.addReportTitle([$scope.report_info.title, $scope.report_info.author]);
       addIssueSummary()
         .then(() => {

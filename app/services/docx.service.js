@@ -77,7 +77,7 @@ nirServices.factory('DocxService', ['$q',
         let header = {opts: HEADER_OPTIONS};
         header.val = issue.name;
         issue_summary_table_header.push(header);
-        issue_total_count_line[i] = "0";
+        issue_total_count_line[i+1] = "0";
       }
       issue_summary_table_header.push({val: CAPTION_TOTAL, opts: HEADER_OPTIONS});
       // Build table content
@@ -107,14 +107,14 @@ nirServices.factory('DocxService', ['$q',
           }
         }
         if (department_total_issue_count == 0) {
-          department_issue_count_line[issues_list.length] = "0";
+          department_issue_count_line[issues_list.length+1] = "0";
         } else {
-          department_issue_count_line[issues_list.length] = department_total_issue_count;
+          department_issue_count_line[issues_list.length+1] = department_total_issue_count;
         }
         issue_total_count += department_total_issue_count;
         issue_summary_table.push(department_issue_count_line);
       }
-      issue_total_count_line[issues_list.length] = issue_total_count;
+      issue_total_count_line[issues_list.length+1] = issue_total_count;
       issue_summary_table.push(issue_total_count_line);
       return issue_summary_table;
     }
