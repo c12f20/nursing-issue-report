@@ -1,9 +1,5 @@
 'use strict';
 
-const sqlite3 = require('sqlite3').verbose();
-const TransactionDatabase = require('sqlite3-transactions').TransactionDatabase;
-const fs = require('fs');
-
 nirServices.factory('DbService', function() {
   const DB_PATH = 'app/assets/db/core.db';
   const DB_VERSION_INVALID = -1;

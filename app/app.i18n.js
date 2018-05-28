@@ -47,6 +47,11 @@ nirApp.config(['$translateProvider',
       // Report Generator UI
       CAPTION_GENERATE_REPORT: "生成报告",
       CAPTION_SELECT_GENERATE_DATE_RANGE: "请选择生成报告的日期范围：",
+      CAPTION_GENERATE: "生成",
+      CAPTION_REPORT_TITLE: "报告标题",
+      HINT_INPUT_REPORT_TITLE: "请输入报告标题",
+      CAPTION_REPORT_AUTHOR: "报告作者",
+      HINT_INPUT_REPORT_AUTHOR: "请输入报告作者",
       // Config UI
       TITLE_CONFIG: "配置",
       CAPTION_DEPARTMENT_LIST: "部门列表",
@@ -79,9 +84,6 @@ nirApp.config(['$translateProvider',
       CAPTION_OPTION_VALUE_NAME: "统计项目可选值",
       HINT_INPUT_OPTION_VALUE_NAME: "请输入统计项目可选值名称",
       CAPTION_ADD_OPTION_VALUE: "添加统计项目可选值",
-      // Report Content
-      DEFAULT_REPORT_NAME: "不良事件分析报告",
-      CAPTION_TOTAL: "合计",
     };
 
     $translateProvider

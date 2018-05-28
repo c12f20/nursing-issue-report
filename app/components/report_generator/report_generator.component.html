@@ -24,4 +24,22 @@
       </p>
     </div>
   </div>
+  <div class="row">
+    <div class="form-group col-xs-6">
+      <label for="reportTitleInput">{{'CAPTION_REPORT_TITLE' | translate}}</label>
+      <input text class="form-control" id="reportTitleInput" ng-required="true"
+        placeholder="{{'HINT_INPUT_REPORT_TITLE' | translate}}" ng-model="report_info.title" />
+    </div>
+  </div>
+  <div class="row">
+    <div class="form-group col-xs-6">
+      <label for="reportAuthorInput">{{'CAPTION_REPORT_AUTHOR' | translate}}</label>
+      <input text class="form-control" id="reportAuthorInput" ng-required="true"
+        placeholder="{{'HINT_INPUT_REPORT_AUTHOR' | translate}}" ng-model="report_info.author" />
+    </div>
+  </div>
+  <p class="btn-double-group">
+    <button class="btn btn-primary" ng-click="onGenerateReport()" ng-disabled="!isReportValid()">{{'CAPTION_GENERATE' | translate}}</button>
+    <button class="btn btn-danger" ng-click="onCancel()" >{{'CAPTION_CANCEL' | translate}}</button>
+  </p>
 </div>
