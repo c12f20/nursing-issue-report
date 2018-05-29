@@ -1,7 +1,7 @@
 'use strict';
 
-nirServices.factory('DocxService', ['$q',
-  function($q) {
+nirServices.factory('DocxService', ['$q', 'ChartService',
+  function($q, chartService) {
     const DEFAULT_FONT_FACE = "微软雅黑";
     const DEFAULT_REPORT_NAME = "不良事件分析报告";
     const CAPTION_TOTAL = "合计";
@@ -135,12 +135,14 @@ nirServices.factory('DocxService', ['$q',
     const TEXT_SUMMARY_CHART = "`全院不良事件发生数和构成比例如${chart_name}。${chart_name}显示，`";
     const SUMMARY_CHART_NAME = "图1";
     const TEXT_SUMMARY_CHART_ISSUE = "`${issue_name}发生${issue_count}例，构成比为${issue_percent}%`";
+    const SUMMARY_CHART_TITLE = "全院不良事件构成比";
     function addIssueSummary(departments_list, issues_list, department_issue_dict) {
+      let deferred = $q.defer();
       if (!departments_list || departments_list.length == 0
       || !issues_list || issues_list.length == 0
       || !department_issue_dict || department_issue_dict.length == 0) {
-        console.error("Failed to add Issue Summary with invalid parameters");
-        return;
+        deferred.reject(new Error("Failed to add Issue Summary with invalid parameters"));
+        return deferred.promise;;
       }
       let summary_table = __buildIssueSummaryTable(departments_list, issues_list, department_issue_dict);
       let total_count = summary_table[departments_list.length+1][issues_list.length+1];
@@ -155,6 +157,8 @@ nirServices.factory('DocxService', ['$q',
       // Summary Chart content
       let chart_name = SUMMARY_CHART_NAME;
       let text_summary_chart = eval(TEXT_SUMMARY_CHART);
+      let issue_name_list = [];
+      let issue_percent_list = [];
       for (let i=0; i < issues_list.length; i++) {
         let issue_name = issues_list[i].name;
         let issue_count = summary_table[departments_list.length+1][i+1];
@@ -166,8 +170,20 @@ nirServices.factory('DocxService', ['$q',
         } else {
           text_summary_chart += "；";
         }
+        // build data for chart
+        issue_name_list[i] = issue_name;
+        issue_percent_list[i] = issue_percent;
       }
       report_data.push({type: 'text', val: text_summary_chart, opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
+      // Summary Chart
+      let chart_title = SUMMARY_CHART_NAME + "：" + SUMMARY_CHART_TITLE;
+      chartService.generatePercentChart(chart_title, issue_name_list, issue_percent_list)
+        .then((png_path) => {
+          report_data.push({type: 'image', path: path.resolve(__dirname, png_path)});
+        }, (err) => {
+          deferred.reject(err);
+        })
+      return deferred.promise;
     }
 
     return {

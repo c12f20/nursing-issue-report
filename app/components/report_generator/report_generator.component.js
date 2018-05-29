@@ -88,8 +88,11 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
         })
         .then((dict) => {
           department_issue_dict = dict;
-          docxService.addIssueSummary(departments_list, issues_list, department_issue_dict);
-          deferred.resolve();
+          docxService.addIssueSummary(departments_list, issues_list, department_issue_dict).then(() => {
+            deferred.resolve();
+          }, (err) => {
+            deferred.reject(err);
+          });
         }, (err) => {
           deferred.reject(err);
         })
@@ -97,7 +100,7 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
     }
 
     $scope.onGenerateReport = function() {
-      docxService.initReportDocx("/Users/hill/", $scope.date_range.start, $scope.date_range.end);
+      docxService.initReportDocx("D:\\", $scope.date_range.start, $scope.date_range.end);
       docxService.addReportTitle([$scope.report_info.title, $scope.report_info.author]);
       addIssueSummary()
         .then(() => {
