@@ -11,12 +11,28 @@ nirServices.factory('DocxService', ['$q', 'ChartService',
     let docx;
     let report_start_date, report_end_date;
     let report_data = [];
-    function __clearAll() {
+    let chart_files = [];
+    function clearAllChartFiles() {
+      for (let i=0; i < chart_files.length; i++) {
+        let delete_file = chart_files[i];
+        fs.unlink(delete_file, (err) => {
+          if (err) {
+            console.error(err);
+            return;
+          }
+          console.log("Delele file: "+delete_file);
+        })
+      }
+      chart_files = [];
+    }
+
+    function clearAll() {
       fout = undefined;
       docx = undefined;
       report_start_date = undefined;
       report_end_date = undefined;
       report_data = [];
+      clearAllChartFiles();
     }
 
     function initReportDocx(folder_path, start_date, end_date) {
@@ -33,6 +49,7 @@ nirServices.factory('DocxService', ['$q', 'ChartService',
       fout = fs.createWriteStream(file_path);
       report_start_date = start_date;
       report_end_date = end_date;
+      return file_path;
     }
 
     function generateReportDocx() {
@@ -44,9 +61,13 @@ nirServices.factory('DocxService', ['$q', 'ChartService',
       docx.createByJson(report_data);
       docx.generate(fout, {
         'finalize': (written) => {
-          console.log('Finish to create a Word file.\nTotal bytes created: ' + written + '\n');
-          __clearAll();
-          deferred.resolve();
+          let file_path = fout.path;
+          console.log('Finish to create a Word file. '+file_path);
+          clearAll();
+          // As it's still in callback, we need set timeout to do save to ensure the file has generated completed.
+          setTimeout(() => {
+            deferred.resolve(file_path);
+          }, 1000);
         },
         'error': (err) => {
           deferred.reject(err);
@@ -179,7 +200,9 @@ nirServices.factory('DocxService', ['$q', 'ChartService',
       let chart_title = SUMMARY_CHART_NAME + "：" + SUMMARY_CHART_TITLE;
       chartService.generatePercentChart(chart_title, issue_name_list, issue_percent_list)
         .then((png_path) => {
-          report_data.push({type: 'image', path: path.resolve(__dirname, png_path)});
+          chart_files.push(png_path);
+          report_data.push({type: 'image', path: png_path});
+          deferred.resolve();
         }, (err) => {
           deferred.reject(err);
         })
@@ -191,5 +214,6 @@ nirServices.factory('DocxService', ['$q', 'ChartService',
       generateReportDocx: generateReportDocx,
       addReportTitle: addReportTitle,
       addIssueSummary: addIssueSummary,
+      clearReportDocx: clearAll,
     }
   }]);

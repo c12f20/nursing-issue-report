@@ -100,13 +100,20 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
     }
 
     $scope.onGenerateReport = function() {
-      docxService.initReportDocx("D:\\", $scope.date_range.start, $scope.date_range.end);
+      docxService.initReportDocx("app/assets/docs", $scope.date_range.start, $scope.date_range.end);
       docxService.addReportTitle([$scope.report_info.title, $scope.report_info.author]);
       addIssueSummary()
         .then(() => {
           return docxService.generateReportDocx();
         })
-        .then(() => {
+        .then((file_path) => {
+          file_path = file_path.substring(file_path.indexOf('/')+1); // skip app folder, as nodejs include it already
+          let file_name = file_path.substring(file_path.lastIndexOf('/')+1);
+          let downloadLink = angular.element('<a></a>');
+          downloadLink.attr('href', file_path);
+          downloadLink.attr('download', file_name);
+			    downloadLink[0].click();
+          
           $state.go('^.home');
         }, (err) => {
           console.error(err);

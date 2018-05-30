@@ -5,7 +5,9 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "rebuild": "electron-rebuild -f -s -v 1.8.4"
+    "rebuild": "electron-rebuild -f -s -v 1.8.4",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "author": "hill.cen",
   "license": "MIT",
