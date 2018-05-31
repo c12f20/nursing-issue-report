@@ -1,7 +1,7 @@
 'use strict';
 
 nirServices.factory('DbService', function() {
-  const DB_PATH = 'app/assets/db/core.db';
+  const DB_PATH = path.resolve(__dirname, 'assets/db/core.db');
   const DB_VERSION_INVALID = -1;
   const DB_VERSION_CURRENT = 1;
   // Construct database

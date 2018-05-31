@@ -99,8 +99,9 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
       return deferred.promise;
     }
 
+    const REPORT_TEMP_FOLDER_PATH = path.resolve(__dirname, "assets/docs");
     $scope.onGenerateReport = function() {
-      docxService.initReportDocx("app/assets/docs", $scope.date_range.start, $scope.date_range.end);
+      docxService.initReportDocx(REPORT_TEMP_FOLDER_PATH, $scope.date_range.start, $scope.date_range.end);
       docxService.addReportTitle([$scope.report_info.title, $scope.report_info.author]);
       addIssueSummary()
         .then(() => {
@@ -113,7 +114,7 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
           downloadLink.attr('href', file_path);
           downloadLink.attr('download', file_name);
 			    downloadLink[0].click();
-          
+
           $state.go('^.home');
         }, (err) => {
           console.error(err);

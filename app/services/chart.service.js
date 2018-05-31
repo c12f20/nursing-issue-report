@@ -2,9 +2,9 @@
 
 nirServices.factory('ChartService', ['$q',
   function($q) {
-    const CHART_FILE_RELATIVE_PATH = "assets/img";
+    const CHART_FILE_TEMP_FOLDER_PATH = path.resolve(__dirname, "assets/img");
     const CHART_BAR_COLORS = ['#c00000', '#7030a0', '#00b050', '#4f81bd', '#ffc000', '#00205a'];
-    
+
     const CAPTION_PERCENT = "构成比%";
     function generatePercentChart(title, names_list, percent_list) {
       let deferred = $q.defer();
@@ -30,7 +30,7 @@ nirServices.factory('ChartService', ['$q',
         yAxis: { type: 'value'},
         series: series_data,
       };
-      let filepath = path.resolve(__dirname, CHART_FILE_RELATIVE_PATH+"/"+title+".png");
+      let filepath = CHART_FILE_TEMP_FOLDER_PATH+"/"+title+".png";
       let report_chart = remote.getGlobal('report_chart');
       report_chart.generateReportChart(options, filepath)
         .then((filepath) => {

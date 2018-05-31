@@ -48,7 +48,7 @@
           <td class="hcenter">{{(reports_info.cur_page-1) * reports_info.count_per_page + $index + 1}}</td>
           <td>{{report.department.name}}</td>
           <td>{{report.issue.name}}</td>
-          <td>{{report.creation_time_string}}</td>
+          <td>{{report.creation_time | date:'yyyy-MM-dd HH:mm:ss'}}</td>
           <td class="hcenter">
             <button class="btn btn-info" ng-click="onEditReportDetail($index)">{{'CAPTION_EDIT' | translate}}</button>
             <button class="btn btn-danger" ng-click="onDeleteReport($index)">{{'CAPTION_DELETE' | translate}}</button>

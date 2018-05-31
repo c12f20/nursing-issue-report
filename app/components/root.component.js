@@ -22,9 +22,8 @@ nirControllers.controller('RootController', ['$scope', '$filter', '$state', 'ngD
     // Main Menu part
     $scope.menu_list = [
       {href: 'root.home', index: 0, name: $filter('translate')('TITLE_HOME')},
-      {href: 'root.demo', index: 1, name: $filter('translate')('DEMO')},
-      {href: 'root.report', index: 2, name: $filter('translate')('TITLE_REPORT_LIST')},
-      {href: 'root.config', index: 3, name: $filter('translate')('TITLE_CONFIG')},
+      {href: 'root.report', index: 1, name: $filter('translate')('TITLE_REPORT_LIST')},
+      {href: 'root.config', index: 2, name: $filter('translate')('TITLE_CONFIG')},
     ];
 
     $scope.selected_index = 0;

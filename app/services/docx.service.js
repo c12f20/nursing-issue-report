@@ -1,7 +1,7 @@
 'use strict';
 
-nirServices.factory('DocxService', ['$q', 'ChartService',
-  function($q, chartService) {
+nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
+  function($q, $filter, chartService) {
     const DEFAULT_FONT_FACE = "微软雅黑";
     const DEFAULT_REPORT_NAME = "不良事件分析报告";
     const CAPTION_TOTAL = "合计";
@@ -41,9 +41,9 @@ nirServices.factory('DocxService', ['$q', 'ChartService',
         console.error("Failed to init Report Docx with invalid parameters");
         return;
       }
-      let file_name = DEFAULT_REPORT_NAME+"("
-        /*+start_date.toLocaleDateString('zh-CN')+" - "
-        +end_date.toLocaleDateString('zh-CN')*/+").docx";
+      let start_date_str = $filter('date')(start_date, 'yyyyMMdd');
+      let end_date_str = $filter('date')(end_date, 'yyyyMMdd');
+      let file_name = DEFAULT_REPORT_NAME+"("+start_date_str+"-"+end_date_str+").docx";
       let file_path = folder_path + "/" + file_name;
       docx = new officegen('docx');
       fout = fs.createWriteStream(file_path);
