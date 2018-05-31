@@ -59,3 +59,7 @@ package-lock.json
 
 # dotenv environment variables file
 .env
+
+#Build directory
+build/
+dist/

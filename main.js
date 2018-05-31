@@ -8,6 +8,15 @@ const BrowserWindow = electron.BrowserWindow
 const path = require('path')
 const url = require('url')
 
+// For Windows installer
+// this should be placed at top of main.js to handle setup events quickly
+const squirrelEventHandler = require('./modules/squirrel_event_handler.js');
+if (squirrelEventHandler.handleEvent()) {
+  // squirrel event handled and app will exit in 1000ms, so don't do anything else
+  return;
+}
+
+// For Report Chart API
 global.report_chart = require('./modules/report_chart.js');
 
 // Keep a global reference of the window object, if you don't, the window will
