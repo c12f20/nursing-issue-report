@@ -68,7 +68,7 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
         && $scope.report_info.author && $scope.report_info.author.length > 0;
     }
 
-    function addIssueSummary() {
+    function buildReportData() {
       let deferred = $q.defer();
       let departments_list, issues_list, department_issue_dict;
       issueService.queryIssues()
@@ -88,11 +88,35 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
         })
         .then((dict) => {
           department_issue_dict = dict;
-          docxService.addIssueSummary(departments_list, issues_list, department_issue_dict).then(() => {
+          return docxService.addIssueSummary(departments_list, issues_list, department_issue_dict);
+        })
+        .then((issue_count_dict) => {
+          for (let i=0; i < issues_list.length; i++) {
+            let issue = issues_list[i];
+            buildIssueDetailData(issue, issue_count_dict[issue.id])
+              .then(() => {
+                if (i == issues_list.length-1) {
+                  deferred.resolve();
+                }
+              }, (err) => {
+                deferred.reject(err);
+              })
+          }
+        }, (err) => {
+          deferred.reject(err);
+        })
+      return deferred.promise;
+    }
+
+    function buildIssueDetailData(issue, count) {
+      let deferred = $q.defer();
+      issueService.queryIssueDetail(issue)
+        .then((issue_object) => {
+          if (!issue_object.hasOptions()) {
             deferred.resolve();
-          }, (err) => {
-            deferred.reject(err);
-          });
+            return;
+          }
+          
         }, (err) => {
           deferred.reject(err);
         })
@@ -103,12 +127,11 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
     $scope.onGenerateReport = function() {
       docxService.initReportDocx(REPORT_TEMP_FOLDER_PATH, $scope.date_range.start, $scope.date_range.end);
       docxService.addReportTitle([$scope.report_info.title, $scope.report_info.author]);
-      addIssueSummary()
+      buildReportData()
         .then(() => {
           return docxService.generateReportDocx();
         })
         .then((file_path) => {
-          file_path = file_path.substring(file_path.indexOf('/')+1); // skip app folder, as nodejs include it already
           let file_name = file_path.substring(file_path.lastIndexOf('/')+1);
           let downloadLink = angular.element('<a></a>');
           downloadLink.attr('href', file_path);

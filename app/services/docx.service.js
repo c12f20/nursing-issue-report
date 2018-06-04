@@ -11,10 +11,17 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
     let docx;
     let report_start_date, report_end_date;
     let report_data = [];
-    let chart_files = [];
-    function clearAllChartFiles() {
-      for (let i=0; i < chart_files.length; i++) {
-        let delete_file = chart_files[i];
+    function __resetVariables() {
+      fout = undefined;
+      docx = undefined;
+      report_start_date = undefined;
+      report_end_date = undefined;
+      report_data = [];
+    }
+
+    function __deleteFiles(files_list) {
+      for (let i=0; i < files_list.length; i++) {
+        let delete_file = files_list[i];
         fs.unlink(delete_file, (err) => {
           if (err) {
             console.error(err);
@@ -23,16 +30,24 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
           console.log("Delele file: "+delete_file);
         })
       }
+    }
+
+    let chart_files = [];
+    function __clearAllChartFiles() {
+      __deleteFiles(chart_files);
       chart_files = [];
     }
 
+    let report_files = [];
+    function __clearAllReportFiles() {
+      __deleteFiles(report_files);
+      report_files = [];
+    }
+
     function clearAll() {
-      fout = undefined;
-      docx = undefined;
-      report_start_date = undefined;
-      report_end_date = undefined;
-      report_data = [];
-      clearAllChartFiles();
+      __resetVariables();
+      __clearAllChartFiles();
+      __clearAllReportFiles();
     }
 
     function initReportDocx(folder_path, start_date, end_date) {
@@ -41,6 +56,7 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
         console.error("Failed to init Report Docx with invalid parameters");
         return;
       }
+      __clearAllReportFiles();
       let start_date_str = $filter('date')(start_date, 'yyyyMMdd');
       let end_date_str = $filter('date')(end_date, 'yyyyMMdd');
       let file_name = DEFAULT_REPORT_NAME+"("+start_date_str+"-"+end_date_str+").docx";
@@ -63,7 +79,10 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
         'finalize': (written) => {
           let file_path = fout.path;
           console.log('Finish to create a Word file. '+file_path);
-          clearAll();
+          __resetVariables();
+          __clearAllChartFiles();
+          // add the file into report files list for later clear
+          report_files.push(file_path);
           // As it's still in callback, we need set timeout to do save to ensure the file has generated completed.
           setTimeout(() => {
             deferred.resolve(file_path);
@@ -180,6 +199,7 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
       let text_summary_chart = eval(TEXT_SUMMARY_CHART);
       let issue_name_list = [];
       let issue_percent_list = [];
+      let issue_count_dict = {};
       for (let i=0; i < issues_list.length; i++) {
         let issue_name = issues_list[i].name;
         let issue_count = summary_table[departments_list.length+1][i+1];
@@ -194,6 +214,8 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
         // build data for chart
         issue_name_list[i] = issue_name;
         issue_percent_list[i] = issue_percent;
+        // build data for issue detail data
+        issue_count_dict[issues_list[i].id] = issue_count;
       }
       report_data.push({type: 'text', val: text_summary_chart, opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
       // Summary Chart
@@ -202,11 +224,16 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
         .then((png_path) => {
           chart_files.push(png_path);
           report_data.push({type: 'image', path: png_path});
-          deferred.resolve();
+          deferred.resolve(issue_count_dict);
         }, (err) => {
           deferred.reject(err);
         })
       return deferred.promise;
+    }
+
+    let issue_display_index = 2; // as summary is 1, issues start from 2
+    function addIssueDetail(issue, count, option_vallist_dict) {
+      
     }
 
     return {
@@ -214,6 +241,7 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
       generateReportDocx: generateReportDocx,
       addReportTitle: addReportTitle,
       addIssueSummary: addIssueSummary,
+      addIssueDetail: addIssueDetail,
       clearReportDocx: clearAll,
     }
   }]);
