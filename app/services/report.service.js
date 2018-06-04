@@ -373,6 +373,36 @@ nirServices.factory('ReportService', ['$q', 'DbService', 'OptionService',
       return deferred.promise;
     }
 
+    function queryOptionInfoByOptionIdInDateRange(option_id, start_date, end_date) {
+      let deferred = $q.defer();
+      __init().then((db) => {
+        let where_clause = buildQueryWhereClause(start_date, end_date);
+        if (where_clause.length == 0) {
+          where_clause = `WHERE option_id=${option_id}`;
+        } else {
+          where_clause += ` and option_id=${option_id}`;
+        }
+        let sql = `SELECT option_value,
+          count(option_value) value_count
+          FROM tblReportDetail
+          LEFT JOIN tblReport ON tblReportDetail.report_id == tblReport.id
+          ${where_clause}
+          GROUP BY option_value`;
+        db.all(sql, [], (err, rows) => {
+          if (err) {
+            deferred.reject(new Error(`Failed to query reports by option id, sql: ${sql}, error: ${err.message}`));
+            return;
+          }
+          let result_dict = {};
+          rows.forEach((row) => {
+            result_dict[row.option_value] = row.value_count;
+          });
+          deferred.resolve(result_dict);
+        });
+      });
+      return deferred.promise;
+    }
+
     return {
       addReport: addReport,
       removeReport: removeReport,
@@ -382,5 +412,6 @@ nirServices.factory('ReportService', ['$q', 'DbService', 'OptionService',
       queryReports: queryReportsInDateRange,
       queryReportDetails: queryReportDetails,
       queryIssueInfoByDepartment: queryIssueInfoByDepartmentInDateRange,
+      queryOptionInfoById: queryOptionInfoByOptionIdInDateRange,
     }
   }]);

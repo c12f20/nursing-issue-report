@@ -1,7 +1,7 @@
 'use strict';
 
-nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q', 'DocxService', 'DepartmentService', 'IssueService', 'ReportService',
-  function($scope, $state, $q, docxService, departmentService, issueService, reportService) {
+nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q', 'DocxService', 'DepartmentService', 'IssueService', 'ReportService', 'OptionService',
+  function($scope, $state, $q, docxService, departmentService, issueService, reportService, optionService) {
     // Date Range UI
     $scope.date_range = {
       start: undefined,
@@ -116,7 +116,10 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
             deferred.resolve();
             return;
           }
-          
+          let options_list = optionService.convertOptionTreeToList(issue_object.options);
+          for (let i=0; i < options_list.length; i++) {
+            reportService.queryOptionInfoById(options_list[i].id);
+          }
         }, (err) => {
           deferred.reject(err);
         })
