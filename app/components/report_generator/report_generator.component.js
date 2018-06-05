@@ -110,6 +110,14 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
 
     function buildIssueDetailData(issue, count) {
       let deferred = $q.defer();
+      if (!issue || !count) {
+        if (issue) {
+          console.log("Ignore issue "+issue.name+" as its count is 0");
+        }
+        deferred.resolve();
+        return deferred.promise;
+      }
+
       issueService.queryIssueDetail(issue)
         .then((issue_object) => {
           if (!issue_object.hasOptions()) {
@@ -117,9 +125,22 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
             return;
           }
           let options_list = optionService.convertOptionTreeToList(issue_object.options);
+          let queryOptionInfoByIdPromisesDict = {};
           for (let i=0; i < options_list.length; i++) {
-            reportService.queryOptionInfoById(options_list[i].id);
+            let option_id = options_list[i].id;
+            queryOptionInfoByIdPromisesDict[option_id] =
+              reportService.queryOptionInfoById(option_id, $scope.date_range.start, $scope.date_range.end);
           }
+          return $q.all(queryOptionInfoByIdPromisesDict);
+        })
+        .then((dict) => {
+          option_vallist_dict = dict;
+          docxService.addIssueDetail(issue, count, option_vallist_dict)
+            .then(() => {
+              deferred.resolve();
+            }, (err) => {
+              deferred.reject(err);
+            })
         }, (err) => {
           deferred.reject(err);
         })

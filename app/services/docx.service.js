@@ -107,6 +107,13 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
       }
     }
     // Issue summary table
+    const CHART_NAME_TEMPLATE = "`图${chart_display_index}`";
+    let chart_display_index = 1;
+    function __buildChartName() {
+      return eval(CHART_NAME_TEMPLATE);
+      chart_display_index++;
+    }
+
     function __buildIssueSummaryTable(departments_list, issues_list, department_issue_dict) {
       // Build table header
       const HEADER_OPTIONS = {cellColWidth: 4261, vAlign: "center"};
@@ -173,7 +180,6 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
     const TITLE_SUMMARY_TABLE = "（一） 各护理部门不良事件汇总表：";
     const TITLE_SUMMARY_CHART = "（二）	全院不良事件构成比：";
     const TEXT_SUMMARY_CHART = "`全院不良事件发生数和构成比例如${chart_name}。${chart_name}显示，`";
-    const SUMMARY_CHART_NAME = "图1";
     const TEXT_SUMMARY_CHART_ISSUE = "`${issue_name}发生${issue_count}例，构成比为${issue_percent}%`";
     const SUMMARY_CHART_TITLE = "全院不良事件构成比";
     function addIssueSummary(departments_list, issues_list, department_issue_dict) {
@@ -195,7 +201,7 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
       report_data.push({type:'text', val: TITLE_SUMMARY_TABLE, opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
       report_data.push({type:'table', val: summary_table, opt: SUMMARY_TABLE_STYLE})
       // Summary Chart content
-      let chart_name = SUMMARY_CHART_NAME;
+      let chart_name = __buildChartName();
       let text_summary_chart = eval(TEXT_SUMMARY_CHART);
       let issue_name_list = [];
       let issue_percent_list = [];
@@ -232,8 +238,30 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
     }
 
     let issue_display_index = 2; // as summary is 1, issues start from 2
+    let option_display_index = 1;
+    const TITLE_ISSUE_SUMMARY = "`${issue_display_index}、 不良事件--${issue_name}：`";
+    const TEXT_ISSUE_SUMMARY = "共发生${issue_name}事件${issue_count}例，现将事件的资料分析如下：";
     function addIssueDetail(issue, count, option_vallist_dict) {
-      
+      let deferred = $q.defer();
+      if (!issue || !count || !option_vallist_dict || option_vallist_dict.length == 0) {
+        deferred.reject(new Error("Failed to add Issue Detail with invalid parameters"));
+        return deferred.promise;
+      }
+      // Title
+      let issue_name = issue.name;
+      report_data.push({type:'text', val: eval(TITLE_ISSUE_SUMMARY), opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
+      issue_display_index++;
+      // Summary
+      let issue_count = count;
+      report_data.push({type:'text', val: eval(TEXT_ISSUE_SUMMARY), opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
+      // Option List
+      option_display_index = 1; // reset option index
+
+      return deferred.promise;
+    }
+
+    function __addOptionDetail(option, values_dict) {
+
     }
 
     return {
