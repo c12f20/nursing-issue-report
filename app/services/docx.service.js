@@ -11,12 +11,17 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
     let docx;
     let report_start_date, report_end_date;
     let report_data = [];
+    let issue_index = 2; // as summary is 1, issues start from 2
+    let option_index = 1;
     function __resetVariables() {
       fout = undefined;
       docx = undefined;
       report_start_date = undefined;
       report_end_date = undefined;
       report_data = [];
+
+      issue_index = 2;
+      option_index = 1;
     }
 
     function __deleteFiles(files_list) {
@@ -237,8 +242,6 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
       return deferred.promise;
     }
 
-    let issue_display_index = 2; // as summary is 1, issues start from 2
-    let option_display_index = 1;
     const TITLE_ISSUE_SUMMARY = "`${issue_display_index}、 不良事件--${issue_name}：`";
     const TEXT_ISSUE_SUMMARY = "共发生${issue_name}事件${issue_count}例，现将事件的资料分析如下：";
     function addIssueDetail(issue, count, option_vallist_dict) {
@@ -249,19 +252,34 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
       }
       // Title
       let issue_name = issue.name;
+      let issue_display_index = Utils.numberToZhUppercase(issue_index);
       report_data.push({type:'text', val: eval(TITLE_ISSUE_SUMMARY), opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
-      issue_display_index++;
+      issue_index++;
       // Summary
       let issue_count = count;
       report_data.push({type:'text', val: eval(TEXT_ISSUE_SUMMARY), opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
       // Option List
       option_display_index = 1; // reset option index
-
+      let options_list = optionService.convertOptionTreeToList(issue.options);
+      for (let i=0; i < options_list.length; i++) {
+        let option = options_list[i];
+        let values_dict = option_vallist_dict[option.id];
+        __addOptionDetail(issue_name, option, values_dict);
+      }
       return deferred.promise;
     }
-
-    function __addOptionDetail(option, values_dict) {
-
+    const TITLE_OPTION_WITHOUTCHART = "`（${option_display_index}）${option_name}：`";
+    const TITLE_OPTION_WITHCHART = "`（${option_display_index}）${option_name}：对${issue_name}影响列于${chart_name}。`";
+    function __addOptionDetail(issue_name, option, values_dict) {
+      let option_display_index = Utils.numberToZhUppercase(option_index);
+      let option_name = option.name;
+      if (option.hasChildren()) {
+        report_data.push({type:'text', val: eval(TITLE_OPTION_WITHOUTCHART), opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
+        return;
+      } else {
+        let chart_name = __buildChartName();
+        report_data.push({type:'text', val: eval(TITLE_OPTION_WITHCHART), opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
+      }
     }
 
     return {

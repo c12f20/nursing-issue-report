@@ -127,7 +127,11 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
           let options_list = optionService.convertOptionTreeToList(issue_object.options);
           let queryOptionInfoByIdPromisesDict = {};
           for (let i=0; i < options_list.length; i++) {
-            let option_id = options_list[i].id;
+            let option = options_list[i];
+            if (!option.isCalculable()) {
+              continue;
+            }
+            let option_id = option.id;
             queryOptionInfoByIdPromisesDict[option_id] =
               reportService.queryOptionInfoById(option_id, $scope.date_range.start, $scope.date_range.end);
           }
