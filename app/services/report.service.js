@@ -21,20 +21,19 @@ nirServices.factory('ReportService', ['$q', 'DbService', 'OptionService',
         return deferred.promise;
       }
       let options_list = optionService.convertOptionTreeToList(options_tree);
+      let addOptionValuePromises = [];
       for (let i=0; i < options_list.length; i++) {
         let option = options_list[i];
         if (!option.isCalculable()) {
           continue;
         }
-        optionService.addOptionValueWithTransaction(transaction, report_id, option)
-          .then(() => {
-            if (i == options_list.length-1) { // last element
-              deferred.resolve();
-            }
-          }, (err) => {
-            deferred.reject(err);
-          });
+        addOptionValuePromises.push(optionService.addOptionValueWithTransaction(transaction, report_id, option));
       }
+      $q.all(addOptionValuePromises).then(() => {
+          deferred.resolve();
+        }, (err) => {
+          deferred.reject(err);
+        });
       return deferred.promise;
     }
 
@@ -112,6 +111,7 @@ nirServices.factory('ReportService', ['$q', 'DbService', 'OptionService',
         return deferred.promise;
       }
       let options_list = optionService.convertOptionTreeToList(options_tree);
+      let removeOptionPromises = [];
       for (let i=0; i < options_list.length; i++) {
         let option = options_list[i];
         if (!option.isCalculable()) {
@@ -120,15 +120,13 @@ nirServices.factory('ReportService', ['$q', 'DbService', 'OptionService',
         if (!option.value_id) {
           continue;
         }
-        optionService.removeOptionValueWithTransaction(transaction, option.value_id)
-          .then(() => {
-            if (i == options_list.length-1) { // last element
-              deferred.resolve();
-            }
-          }, (err) => {
-            deferred.reject(err);
-          });
+        removeOptionPromises.push(optionService.removeOptionValueWithTransaction(transaction, option.value_id));
       }
+      $q.all(removeOptionPromises).then(() => {
+          deferred.resolve();
+        }, (err) => {
+          deferred.reject(err);
+        });
       return deferred.promise;
     }
 
@@ -140,6 +138,7 @@ nirServices.factory('ReportService', ['$q', 'DbService', 'OptionService',
       }
 
       let options_list = optionService.convertOptionTreeToList(options_tree);
+      let updateOptionPromises = [];
       for (let i=0; i < options_list.length; i++) {
         let option = options_list[i];
         if (!option.isCalculable()) {
@@ -151,14 +150,13 @@ nirServices.factory('ReportService', ['$q', 'DbService', 'OptionService',
         } else {
           result = optionService.addOptionValueWithTransaction(transaction, report_id, option);
         }
-        result.then(() => {
-          if (i == options_list.length-1) { // last element
-            deferred.resolve();
-          }
+        updateOptionPromises.push(result);
+      }
+      $q.all(updateOptionPromises).then(() => {
+          deferred.resolve();
         }, (err) => {
           deferred.reject(err);
         });
-      }
       return deferred.promise;
     }
 

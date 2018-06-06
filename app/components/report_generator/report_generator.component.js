@@ -88,20 +88,24 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
         })
         .then((dict) => {
           department_issue_dict = dict;
-          return docxService.addIssueSummary(departments_list, issues_list, department_issue_dict);
+          return docxService.buildIssueSummary(departments_list, issues_list, department_issue_dict);
         })
-        .then((issue_count_dict) => {
+        .then((result) => {
+          let report_data = result.data;
+          let issue_count_dict = result.dict;
+          let buildIssueDetailPromises = [];
           for (let i=0; i < issues_list.length; i++) {
             let issue = issues_list[i];
-            buildIssueDetailData(issue, issue_count_dict[issue.id])
-              .then(() => {
-                if (i == issues_list.length-1) {
-                  deferred.resolve();
-                }
-              }, (err) => {
-                deferred.reject(err);
-              })
+            buildIssueDetailPromises.push(buildIssueDetailData(issue, issue_count_dict[issue.id]));
           }
+          $q.all(buildIssueDetailPromises).then((issues_data) => {
+            for (let i=0; i < issues_data.length; i++) {
+              report_data = report_data.concat(issues_data[i]);
+            }
+            deferred.resolve(report_data);
+          }, (err) => {
+            deferred.reject(err);
+          })
         }, (err) => {
           deferred.reject(err);
         })
@@ -109,19 +113,20 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
     }
 
     function buildIssueDetailData(issue, count) {
+      const empty_data = [];
       let deferred = $q.defer();
       if (!issue || !count) {
         if (issue) {
           console.log("Ignore issue "+issue.name+" as its count is 0");
         }
-        deferred.resolve();
+        deferred.resolve(empty_data);
         return deferred.promise;
       }
 
       issueService.queryIssueDetail(issue)
         .then((issue_object) => {
           if (!issue_object.hasOptions()) {
-            deferred.resolve();
+            deferred.resolve(empty_data);
             return;
           }
           let options_list = optionService.convertOptionTreeToList(issue_object.options);
@@ -138,10 +143,9 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
           return $q.all(queryOptionInfoByIdPromisesDict);
         })
         .then((dict) => {
-          option_vallist_dict = dict;
-          docxService.addIssueDetail(issue, count, option_vallist_dict)
-            .then(() => {
-              deferred.resolve();
+          docxService.buildIssueDetail(issue, count, dict)
+            .then((result_data) => {
+              deferred.resolve(result_data);
             }, (err) => {
               deferred.reject(err);
             })
@@ -154,9 +158,11 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
     const REPORT_TEMP_FOLDER_PATH = path.resolve(__dirname, "assets/docs");
     $scope.onGenerateReport = function() {
       docxService.initReportDocx(REPORT_TEMP_FOLDER_PATH, $scope.date_range.start, $scope.date_range.end);
-      docxService.addReportTitle([$scope.report_info.title, $scope.report_info.author]);
+      let title_data = docxService.buildReportTitle([$scope.report_info.title, $scope.report_info.author]);
+      docxService.appendReportContent(title_data);
       buildReportData()
-        .then(() => {
+        .then((content_data) => {
+          docxService.appendReportContent(content_data);
           return docxService.generateReportDocx();
         })
         .then((file_path) => {

@@ -44,6 +44,10 @@ class Option {
     return this.__db_index;
   }
 
+  isChild() {
+    return this.__db_index != this.__index;
+  }
+
   set parent_name(name) {
     this.__parent_name = name;
   }

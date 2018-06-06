@@ -30,6 +30,7 @@ nirServices.factory('ChartService', ['$q',
         yAxis: { type: 'value'},
         series: series_data,
       };
+      title = title.replace(/[\/\\]/g, ""); // remove all "/" and "\"
       let filepath = CHART_FILE_TEMP_FOLDER_PATH+"/"+title+".png";
       let report_chart = remote.getGlobal('report_chart');
       report_chart.generateReportChart(options, filepath)

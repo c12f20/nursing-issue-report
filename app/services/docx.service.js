@@ -1,7 +1,7 @@
 'use strict';
 
-nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
-  function($q, $filter, chartService) {
+nirServices.factory('DocxService', ['$q', '$filter', 'ChartService', 'OptionService',
+  function($q, $filter, chartService, optionService) {
     const DEFAULT_FONT_FACE = "微软雅黑";
     const DEFAULT_REPORT_NAME = "不良事件分析报告";
     const CAPTION_TOTAL = "合计";
@@ -22,6 +22,7 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
 
       issue_index = 2;
       option_index = 1;
+      chart_index = 1;
     }
 
     function __deleteFiles(files_list) {
@@ -99,24 +100,35 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
       });
       return deferred.promise;
     }
+
+    function appendReportContent(content_data) {
+      if (!content_data || content_data.length == 0) {
+        console.warn("Empty report data, ignore it");
+        return;
+      }
+      report_data = report_data.concat(content_data);
+    }
     // Title
     const TITLE_OPTS = {font_face: DEFAULT_FONT_FACE, font_size: 12, bold: true};
-    function addReportTitle(titles) {
+    function buildReportTitle(titles) {
+      let result_data = [];
       if (!titles || titles.length == 0) {
         console.warn("No titles input, this report is without titles");
-        return;
+        return result_data;
       }
       for (let i=0; i < titles.length; i++) {
         let title = titles[i];
-        report_data.push({type: 'text', val: title, opt: TITLE_OPTS, lopt: LINE_OPT_CENTER});
+        result_data.push({type: 'text', val: title, opt: TITLE_OPTS, lopt: LINE_OPT_CENTER});
       }
+      return result_data;
     }
     // Issue summary table
-    const CHART_NAME_TEMPLATE = "`图${chart_display_index}`";
-    let chart_display_index = 1;
+    const CHART_NAME_TEMPLATE = "`图${chart_index}`";
+    let chart_index = 1;
     function __buildChartName() {
-      return eval(CHART_NAME_TEMPLATE);
-      chart_display_index++;
+      let chart_name = eval(CHART_NAME_TEMPLATE);
+      chart_index++;
+      return chart_name;
     }
 
     function __buildIssueSummaryTable(departments_list, issues_list, department_issue_dict) {
@@ -187,24 +199,25 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
     const TEXT_SUMMARY_CHART = "`全院不良事件发生数和构成比例如${chart_name}。${chart_name}显示，`";
     const TEXT_SUMMARY_CHART_ISSUE = "`${issue_name}发生${issue_count}例，构成比为${issue_percent}%`";
     const SUMMARY_CHART_TITLE = "全院不良事件构成比";
-    function addIssueSummary(departments_list, issues_list, department_issue_dict) {
+    function buildIssueSummary(departments_list, issues_list, department_issue_dict) {
       let deferred = $q.defer();
       if (!departments_list || departments_list.length == 0
       || !issues_list || issues_list.length == 0
-      || !department_issue_dict || department_issue_dict.length == 0) {
+      || !department_issue_dict || Object.keys(department_issue_dict).length == 0) {
         deferred.reject(new Error("Failed to add Issue Summary with invalid parameters"));
         return deferred.promise;;
       }
+      let result_data = [];
       let summary_table = __buildIssueSummaryTable(departments_list, issues_list, department_issue_dict);
       let total_count = summary_table[departments_list.length+1][issues_list.length+1];
       let state_date_text = report_start_date.toLocaleDateString('zh-CN');
       let end_date_text = report_end_date.toLocaleDateString('zh-CN');
       // Summary content
-      report_data.push({type:'text', val: eval(TEXT_SUMMARY), opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
-      report_data.push({type:'text', val: TITLE_SUMMARY, opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
+      result_data.push({type:'text', val: eval(TEXT_SUMMARY), opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
+      result_data.push({type:'text', val: TITLE_SUMMARY, opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
       // Summary Table content
-      report_data.push({type:'text', val: TITLE_SUMMARY_TABLE, opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
-      report_data.push({type:'table', val: summary_table, opt: SUMMARY_TABLE_STYLE})
+      result_data.push({type:'text', val: TITLE_SUMMARY_TABLE, opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
+      result_data.push({type:'table', val: summary_table, opt: SUMMARY_TABLE_STYLE})
       // Summary Chart content
       let chart_name = __buildChartName();
       let text_summary_chart = eval(TEXT_SUMMARY_CHART);
@@ -228,14 +241,14 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
         // build data for issue detail data
         issue_count_dict[issues_list[i].id] = issue_count;
       }
-      report_data.push({type: 'text', val: text_summary_chart, opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
+      result_data.push({type: 'text', val: text_summary_chart, opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
       // Summary Chart
-      let chart_title = SUMMARY_CHART_NAME + "：" + SUMMARY_CHART_TITLE;
+      let chart_title = chart_name + "：" + SUMMARY_CHART_TITLE;
       chartService.generatePercentChart(chart_title, issue_name_list, issue_percent_list)
         .then((png_path) => {
           chart_files.push(png_path);
-          report_data.push({type: 'image', path: png_path});
-          deferred.resolve(issue_count_dict);
+          result_data.push({type: 'image', path: png_path});
+          deferred.resolve({'data': result_data, 'dict': issue_count_dict});
         }, (err) => {
           deferred.reject(err);
         })
@@ -243,51 +256,116 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService',
     }
 
     const TITLE_ISSUE_SUMMARY = "`${issue_display_index}、 不良事件--${issue_name}：`";
-    const TEXT_ISSUE_SUMMARY = "共发生${issue_name}事件${issue_count}例，现将事件的资料分析如下：";
-    function addIssueDetail(issue, count, option_vallist_dict) {
+    const TEXT_ISSUE_SUMMARY = "`共发生${issue_name}事件${issue_count}例，现将事件的资料分析如下：`";
+    function buildIssueDetail(issue, count, option_vallist_dict) {
       let deferred = $q.defer();
-      if (!issue || !count || !option_vallist_dict || option_vallist_dict.length == 0) {
+      if (!issue || !count || !option_vallist_dict || Object.keys(option_vallist_dict).length == 0) {
         deferred.reject(new Error("Failed to add Issue Detail with invalid parameters"));
         return deferred.promise;
       }
+      let result_data = [];
       // Title
       let issue_name = issue.name;
       let issue_display_index = Utils.numberToZhUppercase(issue_index);
-      report_data.push({type:'text', val: eval(TITLE_ISSUE_SUMMARY), opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
+      result_data.push({type:'text', val: eval(TITLE_ISSUE_SUMMARY), opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
       issue_index++;
       // Summary
       let issue_count = count;
-      report_data.push({type:'text', val: eval(TEXT_ISSUE_SUMMARY), opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
+      result_data.push({type:'text', val: eval(TEXT_ISSUE_SUMMARY), opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
       // Option List
-      option_display_index = 1; // reset option index
+      option_index = 1; // reset option index
       let options_list = optionService.convertOptionTreeToList(issue.options);
+      let addOptionPromises = [];
       for (let i=0; i < options_list.length; i++) {
         let option = options_list[i];
         let values_dict = option_vallist_dict[option.id];
-        __addOptionDetail(issue_name, option, values_dict);
+        addOptionPromises.push(__buildOptionDetail(issue_name, option, values_dict));
       }
+      $q.all(addOptionPromises)
+        .then((options_data) => {
+          for(let i=0; i < options_data.length; i++) {
+            result_data = result_data.concat(options_data[i]);
+          }
+          deferred.resolve(result_data);
+        }, (err) => {
+          deferred.reject(err);
+        })
       return deferred.promise;
     }
     const TITLE_OPTION_WITHOUTCHART = "`（${option_display_index}）${option_name}：`";
     const TITLE_OPTION_WITHCHART = "`（${option_display_index}）${option_name}：对${issue_name}影响列于${chart_name}。`";
-    function __addOptionDetail(issue_name, option, values_dict) {
+    const TITLE_SUBOPTION_WITHCHART = "`${suboption_index}、${option_name}：对${issue_name}影响列于${chart_name}。`";
+    const TEXT_OPTION_CHART_SUMMARY = "`${chart_name}显示，`"
+    const TEXT_OPTION_CHART_VALUE = "`${value_name}发生${value_count}例，构成比为${value_percent}%`";
+    const OPTION_CHART_TITLE = "`${option_name}对${issue_name}影响构成比`"
+    function __buildOptionDetail(issue_name, option, values_dict) {
+      let deferred = $q.defer();
       let option_display_index = Utils.numberToZhUppercase(option_index);
       let option_name = option.name;
-      if (option.hasChildren()) {
-        report_data.push({type:'text', val: eval(TITLE_OPTION_WITHOUTCHART), opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
-        return;
-      } else {
-        let chart_name = __buildChartName();
-        report_data.push({type:'text', val: eval(TITLE_OPTION_WITHCHART), opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
+      let result_data = [];
+      if (!option.isCalculable()) { // Non-Calculable 1st level option
+        result_data.push({type:'text', val: eval(TITLE_OPTION_WITHOUTCHART), opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
+        option_index++;
+        deferred.resolve(result_data);
+        return deferred.promise;
       }
+      let chart_name = __buildChartName();
+      if (!option.isChild()) { // Calculable 1st level option
+        result_data.push({type:'text', val: eval(TITLE_OPTION_WITHCHART), opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
+        option_index++;
+      } else { // Calculable child level option
+        let suboption_index = option.index;
+        result_data.push({type:'text', val: eval(TITLE_SUBOPTION_WITHCHART), opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
+      }
+      let values_value_list = Object.values(values_dict);
+      // Calculate total count
+      let total_count = 0;
+      for (let i=0; i < values_value_list.length; i++) {
+        total_count += values_value_list[i];
+      }
+      // Build Chart Summary content
+      let values_name_list = Object.keys(values_dict);
+      let values_percent_list = [];
+      let text_summary_chart = eval(TEXT_OPTION_CHART_SUMMARY);
+      for (let i=0; i < values_name_list.length; i++) {
+        let value_name = values_name_list[i];
+        let value_count = values_dict[value_name];
+        if (!isNaN(value_name)) {
+          value_name += "分";
+        }
+        let value_percent = Math.round(value_count*1000/total_count)/10;
+        let value_text = eval(TEXT_OPTION_CHART_VALUE);
+        text_summary_chart += value_text;
+        if (i == values_name_list.length-1) {
+          text_summary_chart += "。";
+        } else {
+          text_summary_chart += "；";
+        }
+        // build data for chart
+        values_percent_list[i] = value_percent;
+      }
+      result_data.push({type:'text', val: text_summary_chart, opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
+      // Summary Chart
+      let chart_title = chart_name + "：" + eval(OPTION_CHART_TITLE);
+      chart_title = chart_title.replace(/[\n]/g, ""); // remove all "\n"
+      chartService.generatePercentChart(chart_title, values_name_list, values_percent_list)
+        .then((png_path) => {
+          chart_files.push(png_path);
+          result_data.push({type: 'image', path: png_path});
+          deferred.resolve(result_data);
+        }, (err) => {
+          deferred.reject(err);
+        })
+      return deferred.promise;
     }
 
     return {
       initReportDocx: initReportDocx,
       generateReportDocx: generateReportDocx,
-      addReportTitle: addReportTitle,
-      addIssueSummary: addIssueSummary,
-      addIssueDetail: addIssueDetail,
+      appendReportContent: appendReportContent,
+      buildReportTitle: buildReportTitle,
+      buildIssueSummary: buildIssueSummary,
+      buildIssueDetail: buildIssueDetail,
       clearReportDocx: clearAll,
     }
   }]);

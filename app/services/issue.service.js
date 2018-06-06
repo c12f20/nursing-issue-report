@@ -19,17 +19,16 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
         return deferred.promise;
       }
       let options_list = optionService.convertOptionTreeToList(options_tree);
+      let addOptionPromises = [];
       for (let i=0; i < options_list.length; i++) {
         let option = options_list[i];
-        optionService.addOptionWithTransaction(transaction, issue_id, option)
-          .then(() => {
-            if (i == options_list.length-1) { // last element
-              deferred.resolve();
-            }
-          }, (err) => {
-            deferred.reject(err);
-          });
+        addOptionPromises.push(optionService.addOptionWithTransaction(transaction, issue_id, option));
       }
+      $q.all(addOptionPromises).then(() => {
+          deferred.resolve();
+        }, (err) => {
+          deferred.reject(err);
+        });
       return deferred.promise;
     }
 
@@ -125,6 +124,7 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
         return deferred.promise;
       }
       let options_list = optionService.convertOptionTreeToList(options_tree);
+      let updateOptionPromises = [];
       for (let i=0; i < options_list.length; i++) {
         let option = options_list[i];
         let result;
@@ -133,14 +133,13 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
         } else {
           result = optionService.addOptionWithTransaction(transaction, issue_id, option);
         }
-        result.then(() => {
-            if (i == options_list.length-1) { // last element
-              deferred.resolve();
-            }
-          }, (err) => {
-            deferred.reject(err);
-          });
+        updateOptionPromises.push(result);
       }
+      $q.all(updateOptionPromises).then(() => {
+          deferred.resolve();
+        }, (err) => {
+          deferred.reject(err);
+        });
       return deferred.promise;
     }
 
@@ -208,7 +207,6 @@ nirServices.factory('IssueService', ['$q', 'DbService', 'OptionService',
 
     function queryAllIssues(offset, count) {
       let deferred = $q.defer();
-
       __init().then((db) => {
         offset = offset ? offset : 0;
         count = count ? count : -1;
