@@ -1,5 +1,5 @@
 {
-  "name": "NursingIssueReporter",
+  "name": "NIR",
   "version": "1.0.0",
   "description": "A Tool to generate report of nursing issues",
   "main": "main.js",

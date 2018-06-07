@@ -25,6 +25,8 @@ nirApp.config(['$translateProvider',
       CAPTION_MOVE_DOWN: "下移",
       CAPTION_DATE: "日期",
       CAPTION_TODAY: "今天",
+      // APP
+      TITLE_APP: "护理不良事件报告工具",
       // Home UI
       TITLE_HOME: "开始",
       // Report List UI

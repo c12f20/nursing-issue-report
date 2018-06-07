@@ -183,8 +183,10 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService', 'OptionServ
       return issue_summary_table;
     }
 
-    const CONTENT_OPTS = {font_face: DEFAULT_FONT_FACE, font_size: 12};
+    const CONTENT_OPTS = {font_face: DEFAULT_FONT_FACE, font_size: 10};
+    const CHART_OPTS = {cx: 576, cy: 288};
     const SUMMARY_TABLE_STYLE = {
+      sz: 20,
       tableSize: 24,
       tableColor: "ada",
       tableAlign: "center",
@@ -247,7 +249,7 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService', 'OptionServ
       chartService.generatePercentChart(chart_title, issue_name_list, issue_percent_list)
         .then((png_path) => {
           chart_files.push(png_path);
-          result_data.push({type: 'image', path: png_path});
+          result_data.push({type: 'image', path: png_path, opt: CHART_OPTS});
           deferred.resolve({'data': result_data, 'dict': issue_count_dict});
         }, (err) => {
           deferred.reject(err);
@@ -324,11 +326,12 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService', 'OptionServ
         total_count += values_value_list[i];
       }
       // Build Chart Summary content
-      let values_name_list = Object.keys(values_dict);
+      let values_keys_list = Object.keys(values_dict);
+      let values_name_list = [];
       let values_percent_list = [];
       let text_summary_chart = eval(TEXT_OPTION_CHART_SUMMARY);
-      for (let i=0; i < values_name_list.length; i++) {
-        let value_name = values_name_list[i];
+      for (let i=0; i < values_keys_list.length; i++) {
+        let value_name = values_keys_list[i];
         let value_count = values_dict[value_name];
         if (!isNaN(value_name)) {
           value_name += "分";
@@ -336,12 +339,13 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService', 'OptionServ
         let value_percent = Math.round(value_count*1000/total_count)/10;
         let value_text = eval(TEXT_OPTION_CHART_VALUE);
         text_summary_chart += value_text;
-        if (i == values_name_list.length-1) {
+        if (i == values_keys_list.length-1) {
           text_summary_chart += "。";
         } else {
           text_summary_chart += "；";
         }
         // build data for chart
+        values_name_list[i] = value_name;
         values_percent_list[i] = value_percent;
       }
       result_data.push({type:'text', val: text_summary_chart, opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
@@ -351,7 +355,7 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService', 'OptionServ
       chartService.generatePercentChart(chart_title, values_name_list, values_percent_list)
         .then((png_path) => {
           chart_files.push(png_path);
-          result_data.push({type: 'image', path: png_path});
+          result_data.push({type: 'image', path: png_path, opt: CHART_OPTS});
           deferred.resolve(result_data);
         }, (err) => {
           deferred.reject(err);

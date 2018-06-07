@@ -39,7 +39,7 @@
     </div>
   </div>
   <p class="btn-double-group">
-    <button class="btn btn-primary" ng-click="onGenerateReport()" ng-disabled="!isReportValid()">{{'CAPTION_GENERATE' | translate}}</button>
-    <button class="btn btn-danger" ng-click="onCancel()" >{{'CAPTION_CANCEL' | translate}}</button>
+    <button class="btn btn-primary" ng-click="onGenerateReport()" ng-disabled="!isReportValid() || isReportGenerating">{{'CAPTION_GENERATE' | translate}}</button>
+    <button class="btn btn-danger" ng-click="onCancel()" ng-disabled="isReportGenerating">{{'CAPTION_CANCEL' | translate}}</button>
   </p>
 </div>

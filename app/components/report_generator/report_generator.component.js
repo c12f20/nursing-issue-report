@@ -156,7 +156,9 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
     }
 
     const REPORT_TEMP_FOLDER_PATH = path.resolve(__dirname, "assets/docs");
+    $scope.isReportGenerating = false;
     $scope.onGenerateReport = function() {
+      $scope.isReportGenerating = true;
       docxService.initReportDocx(REPORT_TEMP_FOLDER_PATH, $scope.date_range.start, $scope.date_range.end);
       let title_data = docxService.buildReportTitle([$scope.report_info.title, $scope.report_info.author]);
       docxService.appendReportContent(title_data);
@@ -172,6 +174,7 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
           downloadLink.attr('download', file_name);
 			    downloadLink[0].click();
 
+          $scope.isReportGenerating = true;
           $state.go('^.home');
         }, (err) => {
           console.error(err);
