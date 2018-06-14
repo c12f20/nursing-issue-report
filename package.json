@@ -6,8 +6,10 @@
   "scripts": {
     "start": "electron .",
     "rebuild": "electron-rebuild -f -s",
-    "release": "electron-packager . --overwrite --out ./build",
-    "dist-win": "node dist-win.js"
+    "release-win32": "electron-packager ./ --platform=win32 --arch=ia32 --overwrite --out ./build",
+    "release-win64": "electron-packager ./ --platform=win32 --arch=x64 --overwrite --out ./build",
+    "dist-win32": "node dist-win.js ia32",
+    "dist-win64": "node dist-win.js x64"
   },
   "author": "hill.cen",
   "license": "MIT",
