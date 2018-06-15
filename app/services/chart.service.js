@@ -2,7 +2,7 @@
 
 nirServices.factory('ChartService', ['$q',
   function($q) {
-    const CHART_FILE_TEMP_FOLDER_PATH = path.resolve(__dirname, "assets/img");
+    const CHART_FILE_TEMP_FOLDER_PATH = path.resolve(__dirname, "assets/img").replace('app.asar', '');
     const CHART_BAR_COLORS = ['#c00000', '#7030a0', '#00b050', '#4f81bd', '#ffc000', '#00205a'];
 
     const CAPTION_PERCENT = "构成比%";

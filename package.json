@@ -6,12 +6,11 @@
   "scripts": {
     "start": "electron .",
     "rebuild": "electron-rebuild -f -s",
-    "release-win32": "electron-packager ./ --platform=win32 --arch=ia32 --overwrite --out ./build",
-    "release-win64": "electron-packager ./ --platform=win32 --arch=x64 --overwrite --out ./build",
+    "pack": "electron-builder --dir",
     "dist-win32": "node dist-win.js ia32",
     "dist-win64": "node dist-win.js x64"
   },
-  "author": "hill.cen",
+  "author": "Hill",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -19,8 +18,7 @@
   },
   "devDependencies": {
     "electron": "^1.8.7",
-    "electron-packager": "^12.1.0",
-    "electron-winstaller": "^2.6.4"
+    "electron-builder": "^20.15.1"
   },
   "dependencies": {
     "@uirouter/angularjs": "^1.0.15",
@@ -36,7 +34,7 @@
     "echarts": "^4.1.0",
     "ng-dialog": "^1.4.0",
     "officegen": "^0.4.5",
-    "sqlite3": "^4.0.0",
+    "sqlite3": "^3.1.13",
     "sqlite3-transactions": "0.0.5"
   }
 }

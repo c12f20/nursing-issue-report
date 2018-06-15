@@ -155,7 +155,7 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
       return deferred.promise;
     }
 
-    const REPORT_TEMP_FOLDER_PATH = path.resolve(__dirname, "assets/docs");
+    const REPORT_TEMP_FOLDER_PATH = path.resolve(__dirname, "assets/docs").replace('app.asar', '');
     $scope.isReportGenerating = false;
     $scope.onGenerateReport = function() {
       $scope.isReportGenerating = true;

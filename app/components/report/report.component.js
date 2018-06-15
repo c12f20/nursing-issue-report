@@ -62,7 +62,7 @@ nirControllers.controller('ReportController', ['$scope', '$filter', '$state', 'R
         $scope.dismissDialog();
         return;
       }
-      reportService.removeReport(remove_report.id)
+      reportService.removeReport($scope.dialog_info.to_remove_report.id)
         .then(() => {
           load_report_list();
         }, (err) => {
