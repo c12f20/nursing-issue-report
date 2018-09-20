@@ -115,7 +115,7 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
     function buildIssueDetailData(issue, count) {
       const empty_data = [];
       let deferred = $q.defer();
-      if (!issue || !count) {
+      if (!issue || count == 0) {
         if (issue) {
           console.log("Ignore issue "+issue.name+" as its count is 0");
         }
