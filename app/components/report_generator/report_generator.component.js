@@ -1,7 +1,7 @@
 'use strict';
 
-nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q', 'DocxService', 'DepartmentService', 'IssueService', 'ReportService', 'OptionService',
-  function($scope, $state, $q, docxService, departmentService, issueService, reportService, optionService) {
+nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q', '$filter', 'DocxService', 'DepartmentService', 'IssueService', 'ReportService', 'OptionService',
+  function($scope, $state, $q, $filter, docxService, departmentService, issueService, reportService, optionService) {
     // Date Range UI
     $scope.date_range = {
       start: undefined,
@@ -168,17 +168,28 @@ nirControllers.controller('ReportGeneratorController', ['$scope', '$state', '$q'
           return docxService.generateReportDocx();
         })
         .then((file_path) => {
-          let file_name = file_path.substring(file_path.lastIndexOf('/')+1);
-          let downloadLink = angular.element('<a></a>');
-          downloadLink.attr('href', file_path);
-          downloadLink.attr('download', file_name);
-			    downloadLink[0].click();
-
-          $scope.isReportGenerating = true;
-          $state.go('^.home');
+          showSaveDialog(file_path);
         }, (err) => {
+          $scope.isReportGenerating = false;
           console.error(err);
         })
+    }
+
+    const {dialog} = require("electron").remote;
+    const fs = require('fs');
+    function showSaveDialog(src_file_path) {
+      let file_name = src_file_path.substring(src_file_path.lastIndexOf('/')+1);
+      dialog.showSaveDialog({title: $filter('translate')('CAPTION_GENERATE_REPORT'), defaultPath: file_name}, (dest_file_path) => {
+        if (!dest_file_path) {
+          $scope.isReportGenerating = false;
+          $scope.$apply();
+          return;
+        }
+        console.log("Save file into "+dest_file_path);
+        fs.createReadStream(src_file_path).pipe(fs.createWriteStream(dest_file_path));
+
+        $state.go('^.home');
+      });
     }
 
     $scope.onCancel = function() {

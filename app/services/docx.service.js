@@ -133,7 +133,7 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService', 'OptionServ
 
     function __buildIssueSummaryTable(departments_list, issues_list, department_issue_dict) {
       // Build table header
-      const HEADER_OPTIONS = {cellColWidth: 4261, vAlign: "center"};
+      const HEADER_OPTIONS = {cellColWidth: 50, vAlign: "center"};
       let issue_summary_table_header = [{val: "", opts: HEADER_OPTIONS}];
       let issue_total_count_line = [CAPTION_TOTAL];
       for (let i=0; i < issues_list.length; i++) {
@@ -178,7 +178,11 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService', 'OptionServ
         issue_total_count += department_total_issue_count;
         issue_summary_table.push(department_issue_count_line);
       }
-      issue_total_count_line[issues_list.length+1] = issue_total_count;
+      if (issue_total_count == 0) {
+        issue_total_count_line[issues_list.length+1] = "0";
+      } else {
+        issue_total_count_line[issues_list.length+1] = issue_total_count;
+      }
       issue_summary_table.push(issue_total_count_line);
       return issue_summary_table;
     }
@@ -187,6 +191,7 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService', 'OptionServ
     const CHART_OPTS = {cx: 576, cy: 288};
     const SUMMARY_TABLE_STYLE = {
       sz: 20,
+      tableColWidth: 4261,
       tableSize: 24,
       tableColor: "ada",
       tableAlign: "center",
@@ -221,11 +226,19 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService', 'OptionServ
       result_data.push({type:'text', val: TITLE_SUMMARY_TABLE, opt: CONTENT_OPTS, lopt: LINE_OPT_LEFT});
       result_data.push({type:'table', val: summary_table, opt: SUMMARY_TABLE_STYLE})
       // Summary Chart content
+      let issue_count_dict = {};
+      if (total_count == 0) { // No Summary Chart content when there is no issue at all
+        for (let i=0; i < issues_list.length; i++) {
+          let issue_count = summary_table[departments_list.length+1][i+1];
+          issue_count_dict[issues_list[i].id] = issue_count;
+        }
+        deferred.resolve({'data': result_data, 'dict': issue_count_dict});
+        return deferred.promise;
+      }
       let chart_name = __buildChartName();
       let text_summary_chart = eval(TEXT_SUMMARY_CHART);
       let issue_name_list = [];
       let issue_percent_list = [];
-      let issue_count_dict = {};
       for (let i=0; i < issues_list.length; i++) {
         let issue_name = issues_list[i].name;
         let issue_count = summary_table[departments_list.length+1][i+1];
