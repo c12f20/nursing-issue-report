@@ -237,6 +237,7 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService', 'OptionServ
       }
       let chart_name = __buildChartName();
       let text_summary_chart = eval(TEXT_SUMMARY_CHART);
+      let issue_index = 0;
       let issue_name_list = [];
       let issue_percent_list = [];
       for (let i=0; i < issues_list.length; i++) {
@@ -244,15 +245,18 @@ nirServices.factory('DocxService', ['$q', '$filter', 'ChartService', 'OptionServ
         let issue_count = summary_table[departments_list.length+1][i+1];
         let issue_percent = Math.round(issue_count*1000/total_count)/10;
         let issue_text = eval(TEXT_SUMMARY_CHART_ISSUE);
-        text_summary_chart += issue_text;
-        if (i == issues_list.length-1) {
-          text_summary_chart += "。";
-        } else {
-          text_summary_chart += "；";
+        if (issue_count != 0) {
+          text_summary_chart += issue_text;
+          if (i == issues_list.length-1) {
+            text_summary_chart += "。";
+          } else {
+            text_summary_chart += "；";
+          }
+          // build data for chart
+          issue_name_list[issue_index] = issue_name;
+          issue_percent_list[issue_index] = issue_percent;
+          issue_index++;
         }
-        // build data for chart
-        issue_name_list[i] = issue_name;
-        issue_percent_list[i] = issue_percent;
         // build data for issue detail data
         issue_count_dict[issues_list[i].id] = issue_count;
       }
